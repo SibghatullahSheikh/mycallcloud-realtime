@@ -12,7 +12,7 @@ var
   mysqlServer  = require('mysql'),
   request      = require('request'),
   socket       = require('socket.io'),
-  realtime     = require('./realtime'),
+  realtime     = require('./modules/realtime'),
   Agi          = require('./modules/Asterisk/Agi')
 ;
 
