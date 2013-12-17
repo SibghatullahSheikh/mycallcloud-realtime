@@ -1,0 +1,74 @@
+extends layout
+
+block content
+	.row.text-center
+		.col-lg-2.double-row
+			small Agents Waiting
+			h1(data-stat="agents_waiting")
+		.col-lg-10
+			.row
+				.col-lg-3
+					medium Agents Logged In
+					h1(data-stat="agents_logged_in")
+
+					hr
+
+					small Paused Agents
+					h1(data-stat="paused_agents")
+				.col-lg-3
+					medium Agents In Calls
+					h1(data-stat="agents_in_calls")
+
+					hr
+
+					medium Calls Ringing
+					h1(data-stat="calls_ringing")
+				.col-lg-3
+					small Current Active Calls
+					h1(data-stat="current_active_calls")
+
+					hr
+
+					medium Calls Waiting for Agents
+					h1(data-stat="calls_waiting_for_agents")
+				.col-lg-3
+					medium Agents in Dead Calls
+					h1(data-stat="agents_in_dead_calls")
+
+					hr
+
+					medium Agents in Dispo
+					h1(data-stat="agents_in_dispo")
+
+	hr
+
+	h2 Calls Waiting
+
+	table.table.table-striped.table-hover#callsTable
+		thead
+			tr
+				th Campaign
+				th Phone
+				th Time
+				th Call Type
+				th Priority
+		tbody
+
+	hr
+
+	h2 Active Resources
+
+	table.table.table-striped.table-hover#resourcesTable
+		thead
+			tr
+				th User
+				th Status
+				th Time
+				th Campaign
+				th Group
+				th Calls
+				th Contact
+				th Transfer
+				th Success
+				th Actions
+		tbody

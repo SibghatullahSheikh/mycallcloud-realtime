@@ -1,0 +1,83 @@
+body, html {
+	position: relative;
+	height: 100%;
+	width: 100%;
+	font-size: 12px;
+}
+
+h1 {
+	.secondary {
+		color: lighten(@brand1, 15%);
+	}
+}
+
+
+h2 {
+	.secondary {
+		color: lighten(@brand1, 15%);
+	}
+}
+
+.navbar {
+	.border-radius(0);
+	margin-bottom: 0;
+	.box-shadow(0 1px 7px #ccc);
+}
+
+#webphone {
+	height: 0px;
+	position: absolute;
+	overflow: hidden;
+}
+
+#stats {
+	height: 100%;
+	padding-top: @navbar-height;
+	box-sizing: border-box;
+	background-color: #ddd;
+	padding-right: 0;
+	overflow: auto;
+	border-right: 1px solid darken(#ddd, 7%);
+
+	aside {
+		padding: 10px;
+		#gradient > .vertical(#fff, 0%, #ddd, 100%);
+		border: 1px solid darken(#ddd, 7%);
+		border-top: none;
+		border-right: none;
+		color: #fff;
+		text-align: center;
+
+		.text-large {
+			font-size: 200%;
+		}
+
+		.text-small {
+			font-size: 80%;
+		}
+
+		.text-bold {
+			font-weight: 800;
+		}
+
+		.text-highlight {
+			color: #777;
+			text-shadow: 0 1px 3px #ccc;
+		}
+
+	}
+}
+
+#content {
+	height: 100%;
+	padding-top: @navbar-height + 40;
+	box-sizing: border-box;
+	overflow: auto;	
+
+	.double-row {
+		h1 {
+			font-size: 250px;
+			line-height: 250px;
+		}
+	}
+}
