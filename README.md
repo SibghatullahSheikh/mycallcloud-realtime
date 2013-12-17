@@ -1,4 +1,0 @@
-mycallcloud-realtime
-====================
-
-MyCallCloud Realtime
