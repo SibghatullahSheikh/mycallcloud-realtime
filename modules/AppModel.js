@@ -98,7 +98,7 @@ module.exports = function(mysql)
 				agent_avg_wait            : Math.round(( this.campaigns.getAgentWaitToday() / agentCallsToday ) || 0),
 				average_talk_time         : Math.round(( this.campaigns.getAgentCustTalkToday() / agentCallsToday ) || 0),
 				calls_today               : callsToday,
-				average_wrap              : this.campaigns.getAvgWrap(),
+				average_wrap              : Math.round(this.campaigns.getAvgWrap()),
 				average_pause             : Math.round((this.campaigns.getAgentPauseToday() / agentCallsToday ) || 0),
 				// average_agents            : this.campaigns.getAgentsAverageOneMin(),
 				dialable_leads            : this.campaigns.getDialableLeads(),

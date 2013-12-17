@@ -28,10 +28,10 @@ var io          = socket.listen(server);
 var SITE_SECRET = 'your secret here';
 
 var mysql  = mysqlServer.createConnection({
-  host                 : '10.0.20.199',
+  host                 : '66.241.101.90',
   user                 : 'cron',
   password             : '1234',
-  database             : 'asterisk',
+  database             : 'asteriskrcs',
   multipleStatements   : true
 });
 var agi = new Agi({
@@ -85,14 +85,14 @@ var
 
 var basicAuth = express.basicAuth(function(user, pass, cb)
 {
-  var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="10.0.20.199";';
+  var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="192.168.100.51";';
   mysql.query(query, [user, pass], function(err, results)
   {
     if(err)
     {
       return cb(err, null);
     }
-
+	console.log('Results:\n' + results);
     var user = results[0][0] || false;
     user.external_server_ip = results[1][0].external_server_ip;
     console.log(user);
