@@ -31,7 +31,7 @@ var mysql  = mysqlServer.createConnection({
   host                 : '10.0.20.199',
   user                 : 'cron',
   password             : '1234',
-  database             : 'asteriskrcs',
+  database             : 'asterisk',
   multipleStatements   : true
 });
 var agi = new Agi({
@@ -48,7 +48,7 @@ var agi = new Agi({
  * All Environment Settings
  */
 app.configure(function(){
-  app.set('port', process.env.PORT || 3001);
+  app.set('port', process.env.PORT || 3002);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
