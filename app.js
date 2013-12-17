@@ -28,14 +28,14 @@ var io          = socket.listen(server);
 var SITE_SECRET = 'your secret here';
 
 var mysql  = mysqlServer.createConnection({
-  host                 : '192.168.100.59',
+  host                 : '10.0.20.199',
   user                 : 'cron',
   password             : '1234',
   database             : 'asteriskrcs',
   multipleStatements   : true
 });
 var agi = new Agi({
-  host      : '192.168.100.51',
+  host      : '10.0.20.199',
   port      : 5038,
   encoding  : 'ascii',
   username  : 'cron',
@@ -85,7 +85,7 @@ var
 
 var basicAuth = express.basicAuth(function(user, pass, cb)
 {
-  var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="192.168.100.51";';
+  var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="10.0.20.199";';
   mysql.query(query, [user, pass], function(err, results)
   {
     if(err)
@@ -200,7 +200,7 @@ io.sockets.on('connection', function (socket)
   socket.on('monitor', function(data, cb)
   {
     var
-      url  = 'http://192.168.100.50/vicidial/non_agent_api.php',
+      url  = 'http://10.0.20.199/vicidial/non_agent_api.php',
       data = {
         'function'    : 'blind_monitor',
         'stage'       : 'MONITOR',
@@ -229,7 +229,7 @@ io.sockets.on('connection', function (socket)
   socket.on('barge', function(data, cb)
   {
     var
-      url  = 'http://192.168.100.50/vicidial/non_agent_api.php',
+      url  = 'http://10.0.20.199/vicidial/non_agent_api.php',
       data = {
         'function'    : 'blind_monitor',
         'stage'       : 'BARGE',
