@@ -108,12 +108,11 @@ html
 						i.icon-bullhorn
 
 		script#call-template(type="text/template")
-			tr
-				td <%= campaign %>
-				td <%= phone %>
-				td <%= time %>
-				td <%= call_type %>
-				td <%= priority %>
+			td <%= campaign %>
+			td <%= phone %>
+			td <%= seconds_on_hold %>
+			td <%= call_type %>
+			td <%= priority %>
 
 		script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
 		script(src="/js/jquery.metadata.js")

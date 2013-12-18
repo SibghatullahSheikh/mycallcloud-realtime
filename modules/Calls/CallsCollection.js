@@ -46,31 +46,34 @@ module.exports = function(mysql)
 					models = self.models,
 					remove = [],
 					add    = []
+					now    = new Date()
 				;
 
-				for(var i=0; i<models.length; i++)
-				{
-					var
-						model  = models[i]
-					;
+				//Add the time on hold
+				for(var i=0;i<results.length;i++) {
+					results[i].seconds_on_hold = Math.round((now - results[i].time)/1000);
+				}
 
-					if( result = _.findWhere(results, { id: model.id }) )
-					{
+			
+				for(var i=0; i<models.length; i++) {
+
+					if( result = _.findWhere(results, { id: models[i].id }) ) {
 						add.push(result);
-						results = _.without(results, result);
-					}
-					else
-					{
-						remove.push(model);
+						//results = _.without(results, result);
+					} else {
+						remove.push(models[i]);
 					}
 				}
 
-				for(var i=0; i<results.length; i++)
-				{
+				for(var i=0; i<results.length; i++) {
 					add.push(results[i]);
 				}
 
-				self.add(add, { merge: true });
+
+				//self.add(add, { merge: true });
+				
+
+				self.add(results, {merge: true });
 				self.remove(remove);
 
 				if(cb && _.isFunction(cb)) cb(results);

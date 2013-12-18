@@ -12,6 +12,7 @@
 		var CallCollection = bb.Collection.extend({});
 		var CallView = bb.View.extend({
 			
+			tagName: 'tr',
 			template: _.template($('#call-template').html()),
 			
 			events: {
@@ -22,7 +23,8 @@
 			{
 				this.callsTable = $('#callsTable');
 
-				this.listenTo(this.model, 'change', this.render);
+				this.listenTo(this.model, 'change', this.change);
+				this.listenTo(this.model, 'add', this.render);
 				this.listenTo(this.model, 'remove', this.remove);
 			},
 
@@ -33,10 +35,8 @@
 					this.remove();
 					return;
 				}
-
-				this.el = this.template(this.model.toJSON());
-				this.$el = $(this.el);
-
+				
+				this.$el.html(this.template(this.model.toJSON()));
 				this.callsTable.append( this.$el );
 				
 				$('[title]').tooltip();
@@ -44,6 +44,14 @@
 				return this;
 			},
 
+			change: function()
+			{
+				if (!this.$el) return;
+
+				this.$el.html(this.template(this.model.toJSON()));
+				return this;
+			},
+			
 			remove: function()
 			{
 				if(!this.$el) return;
@@ -271,6 +279,11 @@
 					self.calls.remove(call);
 				});
 				
+				socket.on('calls.change', function(call)
+				{
+					self.calls.add(call, { merge: true });
+				});
+			
 
 				socket.on('reconnecting', function(elapsed,attempts)
 				{
