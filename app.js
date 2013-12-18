@@ -32,7 +32,8 @@ var mysql  = mysqlServer.createConnection({
   user                 : 'cron',
   password             : '1234',
   database             : 'asteriskrcs',
-  multipleStatements   : true
+  multipleStatements   : true,
+  timezone			   : 'EST'
 });
 var agi = new Agi({
   host      : '10.0.20.199',
