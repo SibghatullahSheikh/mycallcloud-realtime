@@ -1,0 +1,99 @@
+doctype 5
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/css/style.css')
+		//if lt IE 9
+			script(src="/js/html5shiv.js")
+			script(src="/js/respond.min.js")
+	body(data-role="main")
+		nav.navbar.navbar-fixed-top
+			.navbar-brand 
+				a(href='/', style='color:#fff') MyCallCloud 
+					i beta
+				//- img(src="/img/logo.png")
+			ul.nav.navbar-nav.pull-right
+				li
+					a(href="#", data-toggle="phone") WebPhone
+						b.caret
+					#webphone
+						object(type="application/x-java-applet", width="300", height="330", hspace="0", vspace="0", align="middle", name="webphone")
+							param(name="code", value="webphone.webphone.class")
+							param(name="archive", value="webphone.jar")
+							param(name="codebase", value="webphone")
+							param(name="hasaudio", value="true")
+							param(name="serveraddress", value=user.external_server_ip)
+							param(name="multilinegui", value="false")
+							param(name="username", value=user.phone_login.replace(/\D/g,''))
+							param(name="password", value=user.conf_secret)
+							param(name="register", value="true")
+							param(name="hasaudio", value="true")
+							param(name="displaysipusername", value="false")
+							param(name="hideusernamepwdinput", value="true")
+							param(name="hasconnect", value="false")
+							param(name="haschat", value="0")
+							param(name="autoaccept", value="true")
+							param(name="use_pcmu", value="3")
+							b Java is currently not installed or not enabled.
+
+				li
+					a(href="#") User Settings
+				li
+					a(href="#") Options
+				li(class='downdown')
+					a(href='#', class='dropdown-toggle', data-toggle='dropdown') Reports
+						span(class='caret')
+					ul(class='dropdown-menu', role='menu')
+						li
+							a(href='http://google.com', target='blank') Agent Performance
+						li
+							a(href='http://amazon.com', target='blank') List Performance
+						li
+							a(href='http://apple.com', target='blank') Localize
+		.container(style='margin-top:20px;')
+			h2 Active Resources
+
+			table.table.table-striped.table-hover#resourcesTable
+				thead
+					tr
+						th User
+						th Status
+						th Time
+						th Campaign
+						th Group
+						th Calls
+						th Contact
+						th Transfer
+						th Success
+						th Actions
+				tbody
+		
+		
+		script#resource-template(type="text/template")
+			tr	
+				td: a(href!="http://rcs.mycallcloud.com/vicidial/user_stats.php?user=<%= linkid %>", target='_blank') <%= user %>
+				td <%= status %>
+				td <%= time %>
+				td <%= campaign %>
+				td <%= group %>
+				td <%= calls %>
+				td <%= contacts %>
+				td <%= transfers %>
+				td <%= successes %>
+				td
+					.btn-group(data-session-id!="<%= session_id %>", data-server-ip!="<%= server_ip %>", data-extension!="<%= extension %>")
+						a.btn.btn-success(href="#", title="Listen", data-monitor="1")
+							i.icon-headphones
+						a.btn.btn-warning(href="#", title="Coach", data-coach="1")
+							i.icon-microphone
+						a.btn.btn-danger(href="#", title="Barge", data-barge="1")
+							i.icon-bullhorn
+
+		script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
+		script(src="/js/jquery.metadata.js")
+		script(src="/js/jquery.tablesorter.min.js")
+		script(src="/js/underscore.min.js")
+		script(src="/js/backbone.min.js")
+		script(src="/socket.io/socket.io.js")
+		script(src="/js/bootstrap.min.js")
+		script(src="/js/ResourcesView.js")

@@ -133,6 +133,17 @@ app.get('/', auth, function(req, res)
   });
 });
 
+app.get('/resources', auth, function(req, res) {
+	res.render('resources', {
+		user: req.session.user,
+		data: {
+			users: App.users.toJSON(),
+			calls: App.calls.toJSON(),
+			campaigns: App.users.toJSON()
+		}
+	});
+});
+
 app.get('/spy', function(req, res)
 {
   var

@@ -97,22 +97,6 @@
 
 				this.$el.html( this.template(attrs) );
 
-				switch( this.model.get('status') )
-				{
-					case 'XFER': //waiting
-						this.$el.addClass('warning');
-						break;
-					case 'SENT': 
-						this.$el.addClass('success');
-						break;
-					case 'INCALL': //in call
-						this.$el.addClass('active');
-						break;
-					case 'PAUSED': //paused
-						this.$el.addClass('danger');
-						break;
-				}
-
 				this.usersTable.append( this.$el );
 				
 				$('[title]').tooltip();
