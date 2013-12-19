@@ -51,7 +51,15 @@ module.exports = function(mysql)
 
 				//Add the time on hold
 				for(var i=0;i<results.length;i++) {
-					results[i].seconds_on_hold = Math.round((now - results[i].time)/1000);
+					//calculate the time difference
+					var hours = now.getHours() - results[i].time.getHours();
+					var minutes = now.getMinutes() - results[i].time.getMinutes();
+					var seconds = now.getSeconds() - results[i].time.getSeconds();
+
+					var diff = new Date(0,0,0,hours,minutes,seconds);
+				
+					//add the on hold time to the results
+					results[i].on_hold_time = diff.getHours() + ':' + diff.getMinutes() + ':' + diff.getSeconds();
 				}
 
 			
