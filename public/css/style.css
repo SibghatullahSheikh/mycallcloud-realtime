@@ -2473,7 +2473,7 @@ button.close {
 .navbar-nav > .active > a:hover,
 .navbar-nav > .active > a:focus {
   color: #ffffff;
-  background-color: #87c66b;
+  background-color: #c09853;
 }
 .navbar-nav > .disabled > a,
 .navbar-nav > .disabled > a:hover,
@@ -2576,7 +2576,7 @@ button.close {
 .navbar-nav > .open > a,
 .navbar-nav > .open > a:hover,
 .navbar-nav > .open > a:focus {
-  background-color: #87c66b;
+  background-color: #c09853;
   color: #ffffff;
 }
 .navbar-nav > .open > a .caret,
