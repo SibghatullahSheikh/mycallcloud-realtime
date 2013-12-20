@@ -1,7 +1,7 @@
 (function($, bb, io)
 {
 	var socket = io.connect();
-
+	
 	//doc ready
 	$(function()
 	{
@@ -26,6 +26,15 @@
 				this.listenTo(this.model, 'change', this.change);
 				this.listenTo(this.model, 'add', this.render);
 				this.listenTo(this.model, 'remove', this.remove);
+			
+				this.updateTable = _.debounce(function() {
+					this.callsTable.trigger('update');
+				}, 1000);
+
+				this.sortTable = _.debounce(function() {
+					this.callsTable.find('thead th:eq(2)').trigger('sort');
+				}, 2000);
+
 			},
 
 			render: function()
@@ -39,6 +48,10 @@
 				this.$el.html(this.template(this.model.toJSON()));
 				this.callsTable.append( this.$el );
 				
+				//Update the table and sort on the time on hold column
+				this.updateTable();
+				this.sortTable();
+
 				$('[title]').tooltip();
 				
 				return this;
@@ -88,6 +101,9 @@
 				this.listenTo(this.model, 'change', this.change);
 				this.listenTo(this.model, 'remove', this.remove);
 
+				this.updateTable = _.debounce(function() {
+					this.usersTable.trigger('update');
+				}, 1000);
 			},
 
 			render: function()
@@ -98,9 +114,11 @@
 				this.$el.html( this.template(attrs) );
 
 				this.usersTable.append( this.$el );
-				
+			
+				//Update the table for sorting
+				this.updateTable();
+
 				$('[title]').tooltip();
-				this.usersTable.tablesorter();
 
 				return this;
 			},
@@ -139,6 +157,10 @@
 				attrs.time = this.formatTime(attrs.time);
 
 				this.$el.html( this.template(attrs) );
+				
+				//Update the table for sorting
+				this.updateTable();
+				
 				return this;
 			},
 
@@ -223,6 +245,17 @@
 
 				this.calls = new CallCollection();
 				this.users = new UsersCollection();
+		
+				
+				//Add sorting to the tables
+				$('#resourcesTable').tablesorter({ 
+					theme: 'bootstrap', 
+				});
+
+				$('#callsTable').tablesorter({
+					theme: 'bootstrap', 
+				});
+
 
 				socket.emit('client.ready', function(data)
 				{

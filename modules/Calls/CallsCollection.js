@@ -60,6 +60,16 @@ module.exports = function(mysql)
 				
 					//add the on hold time to the results
 					results[i].on_hold_time = diff.getHours() + ':' + diff.getMinutes() + ':' + diff.getSeconds();
+				
+					function format(time) {
+						var num = time.toString();
+
+						if (num.length === 1) {
+							num = '0' + num;
+						}
+
+						return num;
+					}
 				}
 
 			
