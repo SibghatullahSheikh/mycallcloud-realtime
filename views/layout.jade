@@ -4,8 +4,8 @@ html
 		title= title
 		link(rel='stylesheet', href='/css/style.css')
 		//if lt IE 9
-			script(src="/js/html5shiv.js")
-			script(src="/js/respond.min.js")
+			script(src="/js/libs/html5shiv.js")
+			script(src="/js/libs/respond.min.js")
 	body(data-role="main")
 		nav.navbar.navbar-fixed-top
 			.navbar-brand 
@@ -60,7 +60,7 @@ html
 				li
 					a(href="#") Options
 				
-				li(class='downdown')
+				li(class='dropdown')
 					a(href='#', class='dropdown-toggle', data-toggle='dropdown') Reports
 						span(class='caret')
 					ul(class='dropdown-menu', role='menu')
@@ -70,54 +70,10 @@ html
 							a(href='http://amazon.com', target='blank') List Performance
 						li
 							a(href='http://apple.com', target='blank') Localize
-		.row.full-height
-			.col-lg-2#stats
-				aside
-					p.text-muted.text-small Dropped %
-					.row
-						.col-lg-6.text-right
-							.text-large.text-bold
-								span(data-stat="dropped_pct")
-								span %
-						.col-lg-6.text-left
-							span(data-stat="dropped_running_tally")
-							span(data-stat="dropped_delta")
-					p
-						span.text-danger Dropped - 
-							span(data-stat="dropped")
-						br
-						span.text-success Answered - 
-							span(data-stat="answered")
-				aside
-					p.text-muted.text-small Calls Today
-					span.stat.text-highlight.text-large.text-bold(data-stat="calls_today")
-				aside
-					p.text-muted.text-small Agent Average Wait
-					span.stat.text-highlight.text-large.text-bold(data-stat="agent_avg_wait")
-				aside
-					p.text-muted.text-small Average Talk Time
-					span.stat.text-highlight.text-large.text-bold(data-stat="average_talk_time")
-				aside
-					p.text-muted.text-small Average Wrap
-					span.stat.text-highlight.text-large.text-bold(data-stat="average_wrap")
-				aside
-					p.text-muted.text-small Average Pause
-					span.stat.text-highlight.text-large.text-bold(data-stat="average_pause")
-				//- aside
-				//- 	p.text-muted.text-small Average Agents
-				//- 	span.stat.text-highlight.text-large.text-bold(data-stat="average_agents")
-				aside
-					p.text-muted.text-small Dialable Leads
-					span.stat.text-highlight.text-large.text-bold(data-stat="dialable_leads")
-				//- aside
-				//- 	p.text-muted.text-small Dial Method
-				//- 	span.stat.text-highlight.text-bold.text-capital(data-stat="dial_method")
-			.col-lg-10#content
-				block content
+		
+		block content
 
 		script#resource-template(type="text/template")
-			
-			
 			td: a(href!="http://rcs.mycallcloud.com/vicidial/user_stats.php?user=<%= linkid %>", target='_blank') <%= user %>
 			td <%= status %>
 			td <%= time %>
@@ -144,10 +100,10 @@ html
 			td <%= priority %>
 
 		script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
-		script(src="/js/jquery.metadata.js")
-		script(src="/js/jquery.tablesorter.min.js")
-		script(src="/js/underscore.min.js")
-		script(src="/js/backbone.min.js")
+		script(src="/js/libs/jquery.metadata.js")
+		script(src="/js/libs/jquery.tablesorter.min.js")
+		script(src="/js/libs/underscore.min.js")
+		script(src="/js/libs/backbone.min.js")
+		script(src="/js/libs/bootstrap.min.js")
 		script(src="/socket.io/socket.io.js")
-		script(src="/js/bootstrap.min.js")
-		script(src="/js/actions.js")
+		script(src="/js/app.js")
