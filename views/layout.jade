@@ -36,10 +36,30 @@ html
 							param(name="use_pcmu", value="3")
 							b Java is currently not installed or not enabled.
 
-				li
-					a(href="#") User Settings
+				li(class='dropdown')
+					a(href="#", class='dropdown-toggle', data-toggle='dropdown') User Settings
+						span(class='caret')
+					div(class='dropdown-menu', role='menu', style='width:300px;padding:20px;')
+						form(role='form')
+							div(class='form-group')
+								label Select Campaigns
+								select(multiple, class='form-control', name='option-campaigns')
+									option Campaign 1
+									option Campaign 2
+									option Campaign 3
+
+							div(class='form-group')
+								label Select User Groups
+								select(multiple, class='form-control', name='option-user-groups')
+									option Group 1
+									option Group 2
+									option Group 3
+							
+							button(type='submit' class='btn btn-lg btn-default pull-right') Save User Settings
+				
 				li
 					a(href="#") Options
+				
 				li(class='downdown')
 					a(href='#', class='dropdown-toggle', data-toggle='dropdown') Reports
 						span(class='caret')

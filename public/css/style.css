@@ -1295,13 +1295,13 @@ input[type="number"]::-webkit-inner-spin-button {
   width: 100%;
   height: 29px;
   padding: 6px 12px;
-  font-size: 10px;
+  font-size: 14px;
   line-height: 1.5;
-  color: #8c8a8a;
+  color: #555;
   vertical-align: middle;
-  background-color: #27bef6;
+  background-color: #fff;
   border: 1px solid #27bef6;
-  border-radius: 0;
+  border-radius: 4;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
