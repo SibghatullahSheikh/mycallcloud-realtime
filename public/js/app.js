@@ -5,6 +5,26 @@
 	//doc ready
 	$(function()
 	{
+		var UserOptions = bb.View.extend({
+			
+			el: $('#user-options'),
+
+			events: {
+				'click #options-campaigns' : 'updateCampaignOptions',
+				'click #options-groups' : 'updateGroupOptions',
+			},
+
+			updateCampaignOptions: function(ev) {
+				localStorage.setItem('campaigns', $('#options-campaigns').val().join(','));
+			}, 
+
+			updateGroupOptions: function(ev) {
+				localStorage.setItem('groups', $('#options-groups').val().join(','));
+			}
+		});
+		
+		
+		
 		/**
 		 * Calls Waiting
 		 */
@@ -45,6 +65,15 @@
 					return;
 				}
 				
+				//grab the options	
+				var campaigns = localStorage.getItem('campaigns');
+
+				if (!(campaigns === null)) {
+					if (campaigns.split(',').indexOf(this.model.get('campaign')) === -1) {
+						return;
+					}
+				}
+
 				this.$el.html(this.template(this.model.toJSON()));
 				this.callsTable.append( this.$el );
 				
@@ -107,7 +136,25 @@
 			},
 
 			render: function()
-			{
+			{	
+
+				//grab the options	
+				var userGroups = localStorage.getItem('groups');
+				var campaigns = localStorage.getItem('campaigns');
+				console.log('User:\n' + JSON.stringify(this.model));
+
+				if (!(campaigns === null)) {
+					if (campaigns.split(',').indexOf(this.model.get('campaign')) === -1) {
+						return;
+					}
+				} 
+
+				if (!(userGroups === null)) {
+					if (userGroups.split(',').indexOf(this.model.get('group')) === -1) {
+						return;
+					}
+				} 
+
 				var attrs = this.model.toJSON();
 				attrs.time = this.formatTime(attrs.time);
 
@@ -245,7 +292,7 @@
 
 				this.calls = new CallCollection();
 				this.users = new UsersCollection();
-		
+				this.userOptions = new UserOptions();	
 				
 				//Add sorting to the tables
 				$('#resourcesTable').tablesorter({ 
@@ -272,6 +319,7 @@
 
 				socket.on('users.add', function(user)
 				{
+					
 					self.users.add(user, { merge: true });
 				});
 
