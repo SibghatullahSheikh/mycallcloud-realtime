@@ -41,21 +41,38 @@ html
 					a(href="#", class='dropdown-toggle', data-toggle='dropdown') User Settings
 						span(class='caret')
 					div(class='dropdown-menu', role='menu', style='width:300px;padding:20px;')
-						form(role='form')
+						form(role='form' id='user-options')
 							div(class='form-group')
-								label Select Campaigns
-								select(multiple, class='form-control', name='option-campaigns')
-									option Campaign 1
-									option Campaign 2
-									option Campaign 3
+								label Select Campaigns to Show
+								select(multiple, class='form-control', id='options-campaigns')
+									option CCSV
+									option SICNOTES
+									option SELLCELL
+									option CONSTNTS
+									option PREFDCB
+									option DIRECT
+									option CONWSTNT
+									option SIC
+									option PHANTOM
+									option SLX
+									option TDAVID
+									option 2NDCHANC
 
 							div(class='form-group')
-								label Select User Groups
-								select(multiple, class='form-control', name='option-user-groups')
-									option Group 1
-									option Group 2
-									option Group 3
-							
+								label Select User Groups to Show
+								select(multiple, class='form-control', id='options-groups')
+									option FL-NJTransfersLegend
+									option FLFrontsLegends
+									option FLReorders
+									option NJFrontsLegends
+									option Supervisors
+									option NJTRANSFERS
+									option NJFronts
+
+
+
+
+
 							button(type='submit' class='btn btn-lg btn-default pull-right') Save User Settings
 				
 				li

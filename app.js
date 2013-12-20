@@ -114,8 +114,28 @@ var auth = function(req, res, next)
 };
 
 
+app.post('/options', auth, function(req, res) {
+	//Make sure the key exists
+	if (!(_.has(req.session, 'options'))) {
+		req.session.options = {};
+	}
 
+	//Filter by campaign option
+	if ('option-campaigns' in req.body) {
+		req.session.options.campaigns = req.body['option-campaigns'];
+	} else {
+		req.session.options.campaigns = []; 
+	}
 
+	//Filter by User Groups option
+	if ('option-user-groups' in req.body) {
+		req.session.options.userGroups = req.body['option-user-groups'];
+	} else {
+		req.session.options.userGroups = []; 
+	}
+
+	res.redirect('/');
+});
 
 
 /**
@@ -123,14 +143,14 @@ var auth = function(req, res, next)
  */
 app.get('/', auth, function(req, res)
 {
-  res.render('index', {
-    user: req.session.user,
-    data: {
-      users     : App.users.toJSON(),
-      calls     : App.calls.toJSON(),
-      campaigns : App.users.toJSON()
-    }
-  });
+	res.render('index', {
+		user: req.session.user,
+		data: {
+			users     : App.users.toJSON(),
+			calls     : App.calls.toJSON(),
+			campaigns : App.users.toJSON()
+		}
+	});
 });
 
 app.get('/resources', auth, function(req, res) {

@@ -60,6 +60,7 @@ module.exports = function(mysql, options)
 				"vicidial_campaigns.closer_campaigns AS 'in-group'",
 				"vicidial_live_agents.server_ip AS 'server_ip'"
 			];
+			
 			var query = '';
 			query += "SELECT " + fields.join(',');
 			query += " FROM vicidial_live_agents";
@@ -67,8 +68,6 @@ module.exports = function(mysql, options)
 			query += " LEFT JOIN vicidial_users ON vicidial_live_agents.user = vicidial_users.user";
 			query += " LEFT JOIN vicidial_campaigns ON vicidial_live_agents.campaign_id = vicidial_campaigns.campaign_id";
 			
-			// SELECT vicidial_users.user_id AS id,vicidial_users.full_name AS 'user',vicidial_users.user_group AS 'group',vicidial_live_agents.status AS 'status',vicidial_live_agents.lead_id AS 'lead_id',vicidial_live_agents.conf_exten AS 'session_id',vicidial_live_agents.callerid,UNIX_TIMESTAMP(vicidial_live_agents.last_update_time) - UNIX_TIMESTAMP(vicidial_live_agents.last_call_time) AS 'time',SUBSTRING_INDEX(vicidial_live_agents.extension, '/', -1) AS 'extension',vicidial_live_agents.campaign_id AS 'campaign',vicidial_live_agents.calls_today AS 'calls',vicidial_live_agents.extension AS 'station',(case when realtime.contacts>0 then realtime.contacts else 0 end) 'contacts',(case when realtime.successes>0 then realtime.successes else 0 end) 'successes',(case when realtime.transfers>0 then realtime.transfers else 0 end) 'transfers',vicidial_campaigns.closer_campaigns AS 'in-group',vicidial_live_agents.server_ip AS 'server_ip' FROM vicidial_live_agents LEFT JOIN realtime ON vicidial_live_agents.user = realtime.userid LEFT JOIN vicidial_users ON vicidial_live_agents.user = vicidial_users.user LEFT JOIN vicidial_campaigns ON vicidial_live_agents.campaign_id = vicidial_campaigns.campaign_id
-			// console.log(query);
 			mysql.query(query, function(err, results)
 			{
 				if(err)
@@ -77,21 +76,11 @@ module.exports = function(mysql, options)
 					return;
 				}
 
-				// console.log('users query processing');
-				// for(var it=0; it<results.length; it++)
-				// {
-				// 	// console.log( results[it].user.trim() == 'Noah Seis' );
-				// 	if(results[it].id == 1945)
-				// 	{
-				// 		console.log(results[it]);
-				// 	}
-				// }
 
-				var
-					models = self.models,
-					remove = [],
-					add    = []
-				;
+				var models = self.models;
+				var	remove = [];
+				var	add = [];
+				
 
 				for(var i=0; i<models.length; i++)
 				{
