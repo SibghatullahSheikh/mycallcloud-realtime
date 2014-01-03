@@ -8,18 +8,86 @@
 		var UserOptions = bb.View.extend({
 			
 			el: $('#user-options'),
+			
+			initialize: function() {
+				//Setup the campaigns options
+				var campaigns = localStorage.getItem('campaigns');
+
+				if (campaigns) {
+					$('#options-campaigns').removeAttr('disabled');					
+					$('#options-campaigns').val(campaigns.split(','));
+					$('#show-all-campaigns').prop('checked', false);
+				} else {
+					$('#options-campaigns').attr('disabled','disabled');
+					$('#show-all-campaigns').prop('checked',true);
+
+					//init the local storage
+					localStorage.setItem('campaigns','');
+				}
+
+				//Setup the user groups options
+				var groups = localStorage.getItem('groups');
+
+				if (groups) {
+					$('#options-groups').removeAttr('disabled');					
+					$('#options-groups').val(groups.split(','));
+					$('#show-all-groups').prop('checked', false);
+				} else {
+					$('#options-groups').attr('disabled','disabled');
+					$('#show-all-groups').prop('checked',true);
+
+					//init the local storage
+					localStorage.setItem('groups','');
+				}
+			},
 
 			events: {
 				'click #options-campaigns' : 'updateCampaignOptions',
 				'click #options-groups' : 'updateGroupOptions',
+				'click #show-all-campaigns' : 'showAllCampaigns',
+				'click #show-all-groups' : 'showAllUserGroups' 
 			},
 
 			updateCampaignOptions: function(ev) {
-				localStorage.setItem('campaigns', $('#options-campaigns').val().join(','));
+				var campaigns = $('#options-campaigns').val();
+
+				if (campaigns) {
+					localStorage.setItem('campaigns', campaigns.join(','));
+				} else {
+					//Null means show all campaigns
+					localStorage.setItem('campaigns','');
+				}
 			}, 
 
 			updateGroupOptions: function(ev) {
-				localStorage.setItem('groups', $('#options-groups').val().join(','));
+				var groups = $('#options-groups').val();
+				
+				if (groups) {
+					localStorage.setItem('groups', groups.join(','));
+				} else {
+					//Null means show all groups
+					localStorage.setItem('groups', '');
+				}
+			},
+
+			showAllCampaigns: function(ev) {
+				if($('#show-all-campaigns').prop('checked')) {
+					$('#options-campaigns').attr('disabled', 'disabled');
+					localStorage.setItem('campaigns','');
+				} else {
+					$('#options-campaigns').removeAttr('disabled');
+					this.updateCampaignOptions(ev);
+				}
+			},
+
+			showAllUserGroups: function(ev) {
+				if($('#show-all-groups').prop('checked')) {
+					$('#options-groups').attr('disabled', 'disabled');
+					localStorage.setItem('groups','');
+				} else {
+					$('#options-groups').removeAttr('disabled');
+					this.updateGroupOptions(ev);
+				}
 			}
 		});
 		
@@ -68,7 +136,7 @@
 				//grab the options	
 				var campaigns = localStorage.getItem('campaigns');
 
-				if (!(campaigns === null)) {
+				if (campaigns) {
 					if (campaigns.split(',').indexOf(this.model.get('campaign')) === -1) {
 						return;
 					}
@@ -139,18 +207,19 @@
 			{	
 
 				//grab the options	
-				var userGroups = localStorage.getItem('groups');
+				var groups = localStorage.getItem('groups');
 				var campaigns = localStorage.getItem('campaigns');
-				console.log('User:\n' + JSON.stringify(this.model));
 
-				if (!(campaigns === null)) {
+				//check if user belongs to the filtered campaigns
+				if (campaigns) {
 					if (campaigns.split(',').indexOf(this.model.get('campaign')) === -1) {
 						return;
 					}
 				} 
 
-				if (!(userGroups === null)) {
-					if (userGroups.split(',').indexOf(this.model.get('group')) === -1) {
+				//check if the user belongs to the filtered groups
+				if (groups) {
+					if (groups.split(',').indexOf(this.model.get('group')) === -1) {
 						return;
 					}
 				} 
