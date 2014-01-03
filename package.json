@@ -3,7 +3,8 @@
   "version": "0.0.2",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+  	"start": "./node_modules/forever/bin/forever start --minUptime 5 --spinSleepTime 5 app.js &",
+  	"stop": "./node_modules/forever/bin/forever stop app.js"
   },
   "dependencies": {
     "jade": "~0.35.0",
@@ -15,6 +16,7 @@
     "request": "~2.30.0",
     "express": "~3.4.7",
     "cookie": "~0.1.0",
-    "cookie-signature": "~1.0.1"
+    "cookie-signature": "~1.0.1",
+    "forever": "~0.10.11"
   }
 }
