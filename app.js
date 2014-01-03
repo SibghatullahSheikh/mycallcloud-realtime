@@ -87,13 +87,13 @@ var
 var basicAuth = express.basicAuth(function(user, pass, cb)
 {
   var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="192.168.100.51";';
+  
   mysql.query(query, [user, pass], function(err, results)
   {
     if(err)
     {
       return cb(err, null);
     }
-	console.log('Results:\n' + results);
     var user = results[0][0] || false;
     user.external_server_ip = results[1][0].external_server_ip;
     console.log(user);
@@ -108,41 +108,64 @@ var auth = function(req, res, next)
     if(!err)
     {
       req.session.user = req.user;
-      next();
+	  next();
     }
   });
 };
 
 
-app.post('/options', auth, function(req, res) {
-	//Make sure the key exists
-	if (!(_.has(req.session, 'options'))) {
-		req.session.options = {};
-	}
+var permissions = function(req, res, next) {
+	var test = 'SELECT DISTINCT user_group FROM vicidial_users;';
 
-	//Filter by campaign option
-	if ('option-campaigns' in req.body) {
-		req.session.options.campaigns = req.body['option-campaigns'];
-	} else {
-		req.session.options.campaigns = []; 
-	}
-
-	//Filter by User Groups option
-	if ('option-user-groups' in req.body) {
-		req.session.options.userGroups = req.body['option-user-groups'];
-	} else {
-		req.session.options.userGroups = []; 
-	}
-
-	res.redirect('/');
-});
+	mysql.query(test, function(err, results) {
+		var util = require('util');
+		console.log('Groups: \n' + util.inspect(results));
+	});
+	
+	
+	
+	var query = 'SELECT user_group ' +
+				'FROM vicidial_users ' +
+				'WHERE user="' + req.session.user.user + '";';
+	
+	mysql.query(query, function(err, results) {
+		if (err) {
+			console.log('MySQL Error: ' + err);
+			req.session.campaigns = [];
+			req.session.groups = [];
+			next();
+		} else {
+			var group = results[0].user_group || '';
+			
+			query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
+					'FROM vicidial_user_groups ' +
+					'WHERE user_group = "' + group + '";';
+			
+			mysql.query(query, function(err, results) {
+				if (err) {
+					console.log('MySQL Error: ' + err);
+					req.session.campaigns = [];
+					req.session.groups = [];
+					next();
+				} else {
+					req.session.campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
+					req.session.groups = results[0].admin_viewable_groups || [];
+					next();
+				}
+			});
+		}
+	});
+};
 
 
 /**
  * Routes
  */
-app.get('/', auth, function(req, res)
+app.get('/', auth, permissions, function(req, res)
 {
+	console.log('Campaigns: ' + req.session.campaigns);
+	console.log('Groups: ' + req.session.groups);
+
 	res.render('index', {
 		user: req.session.user,
 		data: {
@@ -153,7 +176,7 @@ app.get('/', auth, function(req, res)
 	});
 });
 
-app.get('/resources', auth, function(req, res) {
+app.get('/resources', auth, permissions, function(req, res) {
 	res.render('resources', {
 		user: req.session.user,
 		data: {
