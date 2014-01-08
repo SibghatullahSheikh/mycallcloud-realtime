@@ -13,7 +13,8 @@ var
   request      = require('request'),
   socket       = require('socket.io'),
   realtime     = require('./modules/realtime'),
-  Agi          = require('./modules/Asterisk/Agi')
+  Agi          = require('./modules/Asterisk/Agi'),
+  _			   = require('underscore')
 ;
 
 
@@ -115,15 +116,7 @@ var auth = function(req, res, next)
 
 
 var permissions = function(req, res, next) {
-	var test = 'SELECT DISTINCT user_group FROM vicidial_users;';
 
-	mysql.query(test, function(err, results) {
-		var util = require('util');
-		console.log('Groups: \n' + util.inspect(results));
-	});
-	
-	
-	
 	var query = 'SELECT user_group ' +
 				'FROM vicidial_users ' +
 				'WHERE user="' + req.session.user.user + '";';
@@ -148,9 +141,30 @@ var permissions = function(req, res, next) {
 					req.session.groups = [];
 					next();
 				} else {
-					req.session.campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
-					req.session.groups = results[0].admin_viewable_groups || [];
-					next();
+					//Save the campaigns
+					var campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
+					
+					//Remove the erroneous '-' campaign value
+					campaigns = _.reject(campaigns, function(campaign){ return campaign == '-'; });
+					req.session.campaigns = campaigns;
+
+					//Save the groups
+					req.session.groups = results[0].admin_viewable_groups.trim() || [];
+					
+					if (req.session.groups === '---ALL---') {
+						//Get the list of available groups
+						var query = 'SELECT DISTINCT user_group FROM vicidial_users;';
+
+						mysql.query(query, function(err, results) {
+							req.session.groups = _.without(_.pluck(results, 'user_group'), '---ALL---', 'ADMIN', 'zADMIN');
+							next();
+						});
+					} else if (req.session.groups == '') {
+						req.session.groups = [group];
+						next();
+					} else {
+						next();
+					}
 				}
 			});
 		}
@@ -172,7 +186,9 @@ app.get('/', auth, permissions, function(req, res)
 			users     : App.users.toJSON(),
 			calls     : App.calls.toJSON(),
 			campaigns : App.users.toJSON()
-		}
+		},
+		campaigns: req.session.campaigns, 
+		groups: req.session.groups,
 	});
 });
 
@@ -183,7 +199,9 @@ app.get('/resources', auth, permissions, function(req, res) {
 			users: App.users.toJSON(),
 			calls: App.calls.toJSON(),
 			campaigns: App.users.toJSON()
-		}
+		},
+		campaigns: req.session.campaigns, 
+		groups: req.session.groups,
 	});
 });
 

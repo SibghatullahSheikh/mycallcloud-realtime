@@ -37,26 +37,17 @@ html
 							param(name="use_pcmu", value="3")
 							b Java is currently not installed or not enabled.
 
-				li(class='dropdown')
-					a(href="#", class='dropdown-toggle', data-toggle='dropdown') User Settings
-						span(class='caret')
-					div(class='dropdown-menu', role='menu', style='width:300px;padding:20px;')
-						form(role='form' id='user-options')
-							div(class='form-group')
+				li.dropdown
+					a.dropdown-toggle(href="#", data-toggle='dropdown') User Settings
+						span.caret
+					div.dropdown-menu(role='menu', style='width:300px;padding:20px;')
+						form#user-options(role='form')
+							div.form-group
 								label Select Campaigns to Show
-								select(multiple, class='form-control', id='options-campaigns')
-									option CCSV
-									option SICNOTES
-									option SELLCELL
-									option CONSTNTS
-									option PREFDCB
-									option DIRECT
-									option CONWSTNT
-									option SIC
-									option PHANTOM
-									option SLX
-									option TDAVID
-									option 2NDCHANC
+								select.form-control#options-campaigns(multiple)
+									each campaign in campaigns
+										option= campaign
+									
 									
 							div.checkbox
 								label
@@ -65,14 +56,9 @@ html
 
 							div(class='form-group')
 								label Select User Groups to Show
-								select(multiple, class='form-control', id='options-groups')
-									option FL-NJTransfersLegend
-									option FLFrontsLegends
-									option FLReorders
-									option NJFrontsLegends
-									option Supervisors
-									option NJTRANSFERS
-									option NJFronts
+								select.form-control#options-groups(multiple)
+									each group in groups
+										option= group
 
 							div.checkbox
 								label
@@ -80,21 +66,23 @@ html
 									| Show all user groups
 
 
-							button(type='submit' class='btn btn-lg btn-default pull-right') Save User Settings
+							a.btn.btn-lg.btn-default.pull-right(href='/') Refresh Display
 
 				li
 					a(href="#") Options
 				
-				li(class='dropdown')
-					a(href='#', class='dropdown-toggle', data-toggle='dropdown') Reports
-						span(class='caret')
-					ul(class='dropdown-menu', role='menu')
+				li.dropdown
+					a.dropdown-toggle(href='#', data-toggle='dropdown') Reports
+						span.caret
+					ul.dropdown-menu(role='menu')
 						li
-							a(href='http://google.com', target='blank') Agent Performance
+							a(href='http://rcs.mycallcloud.com/Reports/tabs.php', target='blank') Report Tabs
 						li
-							a(href='http://amazon.com', target='blank') List Performance
+							a(href='http://rcs.mycallcloud.com/Reports/agents_stats_v2.php', target='blank') Agent Performance
 						li
-							a(href='http://apple.com', target='blank') Localize
+							a(href='http://rcs.mycallcloud.com/Reports/list_performance.php', target='blank') List Performance
+						li
+							a(href='http://rcs.mycallcloud.com/Reports/localize.php', target='blank') Localize
 		
 		block content
 

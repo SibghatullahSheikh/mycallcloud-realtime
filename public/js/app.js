@@ -19,10 +19,11 @@
 					$('#show-all-campaigns').prop('checked', false);
 				} else {
 					$('#options-campaigns').attr('disabled','disabled');
+					$('#options-campaigns option').prop('selected', true);
 					$('#show-all-campaigns').prop('checked',true);
 
-					//init the local storage
-					localStorage.setItem('campaigns','');
+					//init the campaign options
+					this.updateCampaignOptions();
 				}
 
 				//Setup the user groups options
@@ -34,10 +35,11 @@
 					$('#show-all-groups').prop('checked', false);
 				} else {
 					$('#options-groups').attr('disabled','disabled');
+					$('#options-groups option').prop('selected', true);
 					$('#show-all-groups').prop('checked',true);
 
-					//init the local storage
-					localStorage.setItem('groups','');
+					//init the group options
+					this.updateGroupOptions();
 				}
 			},
 
@@ -45,7 +47,7 @@
 				'click #options-campaigns' : 'updateCampaignOptions',
 				'click #options-groups' : 'updateGroupOptions',
 				'click #show-all-campaigns' : 'showAllCampaigns',
-				'click #show-all-groups' : 'showAllUserGroups' 
+				'click #show-all-groups' : 'showAllUserGroups'
 			},
 
 			updateCampaignOptions: function(ev) {
@@ -73,21 +75,25 @@
 			showAllCampaigns: function(ev) {
 				if($('#show-all-campaigns').prop('checked')) {
 					$('#options-campaigns').attr('disabled', 'disabled');
-					localStorage.setItem('campaigns','');
+					$('#options-campaigns option').prop('selected', true);
 				} else {
 					$('#options-campaigns').removeAttr('disabled');
-					this.updateCampaignOptions(ev);
 				}
+
+				//reload the campaign options
+				this.updateCampaignOptions(ev);
 			},
 
 			showAllUserGroups: function(ev) {
 				if($('#show-all-groups').prop('checked')) {
 					$('#options-groups').attr('disabled', 'disabled');
-					localStorage.setItem('groups','');
+					$('#options-groups option').prop('selected', true);	
 				} else {
 					$('#options-groups').removeAttr('disabled');
-					this.updateGroupOptions(ev);
 				}
+
+				//reload the group options
+				this.updateGroupOptions(ev);
 			}
 		});
 		
@@ -135,9 +141,9 @@
 				
 				//grab the options	
 				var campaigns = localStorage.getItem('campaigns');
-
+				
 				if (campaigns) {
-					if (campaigns.split(',').indexOf(this.model.get('campaign')) === -1) {
+					if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(this.model.get('campaign')) === -1)) {
 						return;
 					}
 				}
@@ -205,14 +211,13 @@
 
 			render: function()
 			{	
-
 				//grab the options	
 				var groups = localStorage.getItem('groups');
 				var campaigns = localStorage.getItem('campaigns');
 
 				//check if user belongs to the filtered campaigns
 				if (campaigns) {
-					if (campaigns.split(',').indexOf(this.model.get('campaign')) === -1) {
+					if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(this.model.get('campaign')) === -1)) {
 						return;
 					}
 				} 
