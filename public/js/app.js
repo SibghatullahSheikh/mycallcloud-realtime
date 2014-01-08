@@ -5,6 +5,123 @@
 	//doc ready
 	$(function()
 	{
+		var Container = bb.View.extend({
+			
+			el:$('.column'),
+
+			initialize: function() {
+				this.$el.sortable({ 
+					connectWith: '.column'
+				});
+    
+    			this.$el.disableSelection();
+			}			
+		});
+
+		var CurrentStatusWidget = bb.View.extend({
+			el: $('#current-status-widget'),
+
+			events: {
+				'click .toggle': 'toggle'
+			},
+
+			initialize: function() {
+				this.shown = true;
+			},
+
+			toggle: function(ev) {
+				if (this.shown) {	
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Current Status');
+					this.shown = false;
+				} else {
+					this.$el.find('.portlet-content').css('display', 'block');
+					this.$el.find('.toggle').text('Hide Current Status');
+					this.shown = true;
+				}
+			},
+		});
+
+		var ActiveResourcesWidget = bb.View.extend({
+			el: $('#active-resources-widget'),
+
+			events: {
+				'click .toggle': 'toggle'
+			},
+
+			initialize: function() {
+				this.shown = true;
+				this.$el.resizable({ handles: 's' });
+			},
+
+			toggle: function(ev) {
+				if (this.shown) {	
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Active Resources');
+					this.shown = false;
+					this.$el.resizable('destroy');
+					this.$el.css('height','auto');
+				} else {
+					this.$el.find('.portlet-content').css('display', 'block');
+					this.$el.find('.toggle').text('Hide Active Resources');
+					this.shown = true;
+					this.$el.resizable({ handles:'s' });
+				}
+			},
+		});
+
+		var CallsWaitingWidget = bb.View.extend({
+			el: $('#calls-waiting-widget'),
+
+			events: {
+				'click .toggle': 'toggle'
+			},
+
+			initialize: function() {
+				this.shown = true;
+				this.$el.resizable({ handles: 's' });
+			},
+
+			toggle: function(ev) {
+				if (this.shown) {	
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Calls Waiting');
+					this.shown = false;
+					this.$el.resizable('destroy');
+					this.$el.css('height','auto');
+				} else {
+					this.$el.find('.portlet-content').css('display', 'block');
+					this.$el.find('.toggle').text('Hide Calls Waiting');
+					this.shown = true;
+					this.$el.resizable({ handles:'s' });
+				}
+			},
+		});
+
+		var SummaryStatsWidget = bb.View.extend({
+			el: $('#summary-statistics-widget'),
+
+			events: {
+				'click .toggle': 'toggle'
+			},
+
+			initialize: function() {
+				this.shown = true;
+			},
+
+			toggle: function(ev) {
+				if (this.shown) {	
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Summary Stats');
+					this.shown = false;
+				} else {
+					this.$el.find('.portlet-content').css('display', 'block');
+					this.$el.find('.toggle').text('Hide Summary Stats');
+					this.shown = true;
+				}
+			},
+		});
+
 		var UserOptions = bb.View.extend({
 			
 			el: $('#user-options'),
@@ -367,7 +484,12 @@
 				this.calls = new CallCollection();
 				this.users = new UsersCollection();
 				this.userOptions = new UserOptions();	
-				
+				this.callsWaitingWidget = new CallsWaitingWidget();
+				this.summaryStatsWidget = new SummaryStatsWidget();
+				this.currentStatusWidget = new CurrentStatusWidget();
+				this.activeResourcesWidget = new ActiveResourcesWidget();
+				this.container = new Container();
+
 				//Add sorting to the tables
 				$('#resourcesTable').tablesorter({ 
 					theme: 'bootstrap', 
