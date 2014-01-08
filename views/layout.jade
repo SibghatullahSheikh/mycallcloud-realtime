@@ -4,6 +4,8 @@ html
 		title= title
 		link(rel='stylesheet', href='/css/style.css')
 		link(rel='stylesheet', href='/css/theme.bootstrap.css')
+		link(rel='stylesheet', href='/css/jquery-ui-1.10.3.custom.min.css')
+		
 		//if lt IE 9
 			script(src="/js/libs/html5shiv.js")
 			script(src="/js/libs/respond.min.js")
@@ -119,4 +121,7 @@ html
 		script(src="/js/libs/backbone.min.js")
 		script(src="/js/libs/bootstrap.min.js")
 		script(src="/socket.io/socket.io.js")
+		script(src='/js/libs/jquery-ui-1.10.3.custom.min.js')
 		script(src="/js/app.js")
+
+		block scripts
