@@ -13,7 +13,8 @@ var
   request      = require('request'),
   socket       = require('socket.io'),
   realtime     = require('./modules/realtime'),
-  Agi          = require('./modules/Asterisk/Agi')
+  Agi          = require('./modules/Asterisk/Agi'),
+  _			   = require('underscore')
 ;
 
 
@@ -87,13 +88,13 @@ var
 var basicAuth = express.basicAuth(function(user, pass, cb)
 {
   var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="192.168.100.51";';
+  
   mysql.query(query, [user, pass], function(err, results)
   {
     if(err)
     {
       return cb(err, null);
     }
-	console.log('Results:\n' + results);
     var user = results[0][0] || false;
     user.external_server_ip = results[1][0].external_server_ip;
     console.log(user);
@@ -108,59 +109,99 @@ var auth = function(req, res, next)
     if(!err)
     {
       req.session.user = req.user;
-      next();
+	  next();
     }
   });
 };
 
 
-app.post('/options', auth, function(req, res) {
-	//Make sure the key exists
-	if (!(_.has(req.session, 'options'))) {
-		req.session.options = {};
-	}
+var permissions = function(req, res, next) {
 
-	//Filter by campaign option
-	if ('option-campaigns' in req.body) {
-		req.session.options.campaigns = req.body['option-campaigns'];
-	} else {
-		req.session.options.campaigns = []; 
-	}
+	var query = 'SELECT user_group ' +
+				'FROM vicidial_users ' +
+				'WHERE user="' + req.session.user.user + '";';
+	
+	mysql.query(query, function(err, results) {
+		if (err) {
+			console.log('MySQL Error: ' + err);
+			req.session.campaigns = [];
+			req.session.groups = [];
+			next();
+		} else {
+			var group = results[0].user_group || '';
+			
+			query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
+					'FROM vicidial_user_groups ' +
+					'WHERE user_group = "' + group + '";';
+			
+			mysql.query(query, function(err, results) {
+				if (err) {
+					console.log('MySQL Error: ' + err);
+					req.session.campaigns = [];
+					req.session.groups = [];
+					next();
+				} else {
+					//Save the campaigns
+					var campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
+					
+					//Remove the erroneous '-' campaign value
+					campaigns = _.reject(campaigns, function(campaign){ return campaign == '-'; });
+					req.session.campaigns = campaigns;
 
-	//Filter by User Groups option
-	if ('option-user-groups' in req.body) {
-		req.session.options.userGroups = req.body['option-user-groups'];
-	} else {
-		req.session.options.userGroups = []; 
-	}
+					//Save the groups
+					req.session.groups = results[0].admin_viewable_groups.trim() || [];
+					
+					if (req.session.groups === '---ALL---') {
+						//Get the list of available groups
+						var query = 'SELECT DISTINCT user_group FROM vicidial_users;';
 
-	res.redirect('/');
-});
+						mysql.query(query, function(err, results) {
+							req.session.groups = _.without(_.pluck(results, 'user_group'), '---ALL---', 'ADMIN', 'zADMIN');
+							next();
+						});
+					} else if (req.session.groups == '') {
+						req.session.groups = [group];
+						next();
+					} else {
+						next();
+					}
+				}
+			});
+		}
+	});
+};
 
 
 /**
  * Routes
  */
-app.get('/', auth, function(req, res)
+app.get('/', auth, permissions, function(req, res)
 {
+	console.log('Campaigns: ' + req.session.campaigns);
+	console.log('Groups: ' + req.session.groups);
+
 	res.render('index', {
 		user: req.session.user,
 		data: {
 			users     : App.users.toJSON(),
 			calls     : App.calls.toJSON(),
 			campaigns : App.users.toJSON()
-		}
+		},
+		campaigns: req.session.campaigns, 
+		groups: req.session.groups,
 	});
 });
 
-app.get('/resources', auth, function(req, res) {
+app.get('/resources', auth, permissions, function(req, res) {
 	res.render('resources', {
 		user: req.session.user,
 		data: {
 			users: App.users.toJSON(),
 			calls: App.calls.toJSON(),
 			campaigns: App.users.toJSON()
-		}
+		},
+		campaigns: req.session.campaigns, 
+		groups: req.session.groups,
 	});
 });
 

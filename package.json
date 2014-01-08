@@ -3,8 +3,9 @@
   "version": "0.0.2",
   "private": true,
   "scripts": {
-  	"start": "./node_modules/forever/bin/forever start --minUptime 5 --spinSleepTime 5 app.js &",
-  	"stop": "./node_modules/forever/bin/forever stop app.js"
+	"start": "node ./node_modules/supervisor/lib/cli-wrapper.js -w modules,views,app.js -e css,jade,js app.js",
+    "production": "./node_modules/forever/bin/forever start --minUptime 5 --spinSleepTime 5 app.js &",
+    "stop": "./node_modules/forever/bin/forever stop app.js"
   },
   "dependencies": {
     "jade": "~0.35.0",
@@ -18,5 +19,8 @@
     "cookie": "~0.1.0",
     "cookie-signature": "~1.0.1",
     "forever": "~0.10.11"
+  },
+  "devDependencies": {
+    "supervisor": "~0.5.6"
   }
 }
