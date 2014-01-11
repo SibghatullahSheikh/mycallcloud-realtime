@@ -5844,3 +5844,64 @@ h2 .secondary {
 .ui-sortable-placeholder * { 
 	visibility: hidden; 
 }
+.stat-number {
+  font-size: 66px;
+  line-height: 75px;
+  margin-bottom: 20px;
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 800;
+  color: #58cdf8;
+}
+.stat-header {
+  font-size:17px;
+  line-height:18px;
+  font-weight:bold;
+  margin: 10px 0 10px 0;
+}
+
+/* Expanded Display Option */
+.expanded .stat-number {
+	font-size:100px;
+	line-height:120px;
+	margin-bottom:30px;
+	letter-spacing: .01em;
+}
+.expanded .stat-header {
+  font-size: 20px;
+  line-height:22px;
+  margin: 15px 0 15px 0;
+}
+.expanded button, 
+.expanded a, 
+.expanded thead,
+.expanded tbody,
+.expanded li,
+.expanded p {
+  font-size:150%;
+}
+.expanded .navbar {
+  padding: 10px 15px 10px 15px;
+}
+
+/* Condensed Display Option */
+.condensed .stat-header {
+  font-size: 14px;
+  line-height: 15px;
+  margin: 5px 0 5px 0;
+}
+.condensed hr {
+  margin: 2px 0 2px 0;
+}
+.condensed h2 {
+  margin-top:-5px;
+  margin-bottom: 0px;
+}
+.condensed .portlet {
+  padding: .35em;
+}
+.condensed .stat-number {
+	font-size:40px;
+	line-height:50px;
+	margin-bottom:0px;
+}

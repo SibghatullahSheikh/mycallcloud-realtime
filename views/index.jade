@@ -1,115 +1,114 @@
 extends layout
 
 block content
-	.row.full-height
-		//-
-			.col-lg-2#stats
-				aside
-					p.text-muted.text-small Dropped %
-					.row
-						.col-lg-6.text-right
-							.text-large.text-bold
-								span(data-stat="dropped_pct")
-								span %
-						.col-lg-6.text-left
-							span(data-stat="dropped_running_tally")
-							span(data-stat="dropped_delta")
-					p
-						span.text-danger Dropped - 
-							span(data-stat="dropped")
-						br
-						span.text-success Answered - 
-							span(data-stat="answered")
-		
-		.col-lg-12#content
-				
-			.column
-				.portlet#summary-statistics-widget
-					.portlet-header
-						h2 Summary Statistics
-						button.btn-link.toggle Hide Summary Stats
-					.portlet-content
-						hr
-						.row(style='text-align:center;')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Dropped %
-								h1(data-stat='dropped_pct')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Calls Today
-								h1(data-stat='calls_today')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Agent Average Wait
-								h1(data-stat='agent_avg_wait')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Average Talk Time
-								h1(data-stat='average_talk_time')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Average Wrap
-								h1(data-stat='average_wrap')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Average Pause
-								h1(data-stat='average_pause')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Dialable Leads
-								h1(data-stat='dialable_leads')
+  .row.full-height
+    //-
+      .col-lg-2#stats
+        aside
+          p.text-muted.text-small Dropped %
+          .row
+            .col-lg-6.text-right
+              .text-large.text-bold
+                span(data-stat="dropped_pct")
+                span %
+            .col-lg-6.text-left
+              span(data-stat="dropped_running_tally")
+              span(data-stat="dropped_delta")
+          p
+            span.text-danger Dropped - 
+              span(data-stat="dropped")
+            br
+            span.text-success Answered - 
+              span(data-stat="answered")
+  
+    .col-lg-12#content
+      .column
+        .portlet#summary-statistics-widget
+          .portlet-header
+            h2 Summary Statistics
+            button.btn-link.toggle Hide Summary Stats
+          .portlet-content
+            hr
+            .row(style='text-align:center;')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Dropped %
+                .stat-number(data-stat='dropped_pct')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Today
+                .stat-number(data-stat='calls_today')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agent Average Wait
+                .stat-number(data-stat='agent_avg_wait')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Average Talk Time
+                .stat-number(data-stat='average_talk_time')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Average Wrap
+                .stat-number(data-stat='average_wrap')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Average Pause
+                .stat-number(data-stat='average_pause')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Dialable Leads
+                .stat-number(data-stat='dialable_leads')
 
-				.portlet#current-status-widget
-					.portlet-header 
-						h2 Current Status
-						button.btn-link.toggle Hide Current Status
-					.portlet-content
-						hr
-						.row(style='text-align:center;')
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Agents Waiting
-								h1(data-stat="agents_waiting")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Agents Logged In
-								h1(data-stat="agents_logged_in")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Paused Agents
-								h1(data-stat="paused_agents")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Agents In Calls
-								h1(data-stat="agents_in_calls")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Calls Ringing
-								h1(data-stat="calls_ringing")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Current Active Calls
-								h1(data-stat="current_active_calls")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Calls Waiting for Agents
-								h1(data-stat="calls_waiting_for_agents")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Agents in Dead Calls
-								h1(data-stat="agents_in_dead_calls")
-							.col-lg-3.col-sm-6.col-xs-12
-								h3 Agents in Dispo
-								h1(data-stat="agents_in_dispo")
+        .portlet#current-status-widget
+          .portlet-header 
+            h2 Current Status
+            button.btn-link.toggle Hide Current Status
+          .portlet-content
+            hr
+            .row(style='text-align:center;')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents Waiting
+                .stat-number(data-stat="agents_waiting")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents Logged In
+                .stat-number(data-stat="agents_logged_in")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Paused Agents
+                .stat-number(data-stat="paused_agents")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents In Calls
+                .stat-number(data-stat="agents_in_calls")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Ringing
+                .stat-number(data-stat="calls_ringing")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Current Active Calls
+                .stat-number(data-stat="current_active_calls")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Waiting for Agents
+                .stat-number(data-stat="calls_waiting_for_agents")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents in Dead Calls
+                .stat-number(data-stat="agents_in_dead_calls")
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents in Dispo
+                .stat-number(data-stat="agents_in_dispo")
 
-				.portlet#calls-waiting-widget
-					.portlet-header 
-						h2 Calls Waiting
-						button.btn-link.toggle Hide Calls Waiting
-					.portlet-content 
-						hr
-						table.table.table-striped.table-hover#callsTable
-							thead
-								tr
-									th(class='{sorter: false}', style='cursor:default;') Campaign
-									th(class='{sorter: false}', style='cursor:default;') Phone
-									th On Hold Time 
-									th(class='{sorter: false}', style='cursor:default;') Call Type
-									th(class='{sorter: false}', style='cursor:default;') Priority
-							tbody
+        .portlet#calls-waiting-widget
+          .portlet-header 
+            h2 Calls Waiting
+            button.btn-link.toggle Hide Calls Waiting
+          .portlet-content 
+            hr
+            table.table.table-striped#callsTable
+              thead
+                tr
+                  th(class='{sorter: false}', style='cursor:default;') Campaign
+                  th(class='{sorter: false}', style='cursor:default;') Phone
+                  th On Hold Time 
+                  th(class='{sorter: false}', style='cursor:default;') Call Type
+                  th(class='{sorter: false}', style='cursor:default;') Priority
+              tbody
 
-				.portlet#active-resources-widget
-					.portlet-header 
-						h2 Active Resources
-						button.btn-link.toggle Hide Active Resources
-						| |  
-						a(href='/resources',target='_blank', style='margin-bottom:25px;') Open in new tab
-					.portlet-content
-						hr
-						include _resources-table
+        .portlet#active-resources-widget
+          .portlet-header 
+            h2 Active Resources
+            button.btn-link.toggle Hide Active Resources
+            | |  
+            a(href='/resources',target='_blank', style='margin-bottom:25px;') Open in new tab
+          .portlet-content
+            hr
+            include _resources-table

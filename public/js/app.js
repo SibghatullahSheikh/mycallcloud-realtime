@@ -11,11 +11,26 @@
 
 			initialize: function() {
 				this.$el.sortable({ 
-					connectWith: '.column'
+					connectWith: '.column',
+          update: function( event, ui ) {
+            localStorage.setItem('order', _.pluck($('.column').children(),'id').join(','));
+          }
 				});
     
-    			this.$el.disableSelection();
-			}			
+    		this.$el.disableSelection();
+			 
+        //Initialize the order of the widgets
+        var order = localStorage.getItem('order');
+
+        if (order) {
+          order = order.split(',')
+
+          _.each(order, function(id) {
+            $('#' + id).appendTo('.column');
+          });
+        }
+      
+      }			
 		});
 
 		var CurrentStatusWidget = bb.View.extend({
@@ -26,20 +41,32 @@
 			},
 
 			initialize: function() {
-				this.shown = true;
+				this.shown = localStorage.getItem('showCurrentStatus') || true;
+        
+        //localStorage saves everything as strings, so convert to bool
+        if (this.shown == "false") {
+          this.shown = false;
+        }
+
+        this.update();
 			},
 
 			toggle: function(ev) {
+			  this.shown = !this.shown;
+        localStorage.setItem('showCurrentStatus', this.shown);
+        this.update();
+      },
+
+      update: function() {
+        console.log("Update: " + this.shown);
 				if (this.shown) {	
-					this.$el.find('.portlet-content').css('display', 'none');
-					this.$el.find('.toggle').text('Show Current Status');
-					this.shown = false;
-				} else {
 					this.$el.find('.portlet-content').css('display', 'block');
 					this.$el.find('.toggle').text('Hide Current Status');
-					this.shown = true;
+				} else {
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Current Status');
 				}
-			},
+      },
 		});
 
 		var ActiveResourcesWidget = bb.View.extend({
@@ -50,24 +77,39 @@
 			},
 
 			initialize: function() {
-				this.shown = true;
-				this.$el.resizable({ handles: 's' });
+				this.shown = localStorage.getItem('showActiveResources') || true;
+        
+        //localStorage saves everything as strings, so convert to bool
+        if (this.shown == "false") {
+          this.shown = false;
+        }
+
+        this.update();
 			},
 
 			toggle: function(ev) {
+			  this.shown = !this.shown;
+        localStorage.setItem('showActiveResources', this.shown);
+        this.update();
+      },
+			
+      update: function() {
 				if (this.shown) {	
-					this.$el.find('.portlet-content').css('display', 'none');
-					this.$el.find('.toggle').text('Show Active Resources');
-					this.shown = false;
-					this.$el.resizable('destroy');
-					this.$el.css('height','auto');
-				} else {
 					this.$el.find('.portlet-content').css('display', 'block');
 					this.$el.find('.toggle').text('Hide Active Resources');
-					this.shown = true;
 					this.$el.resizable({ handles:'s' });
+				} else {
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Active Resources');
+					this.$el.css('height','auto');
+				
+          //This throws an error if it tries to destroy before it's created, just ignore
+          try {
+            this.$el.resizable('destroy');
+          }
+          catch(err) {}
 				}
-			},
+      }
 		});
 
 		var CallsWaitingWidget = bb.View.extend({
@@ -78,24 +120,39 @@
 			},
 
 			initialize: function() {
-				this.shown = true;
-				this.$el.resizable({ handles: 's' });
+				this.shown = localStorage.getItem('showCallsWaiting') || true;
+        
+        //localStorage saves everything as strings, so convert to bool
+        if (this.shown == "false") {
+          this.shown = false;
+        }
+
+        this.update();
 			},
 
 			toggle: function(ev) {
+			  this.shown = !this.shown;
+        localStorage.setItem('showCallsWaiting', this.shown);
+        this.update()
+      },
+
+      update: function() {
 				if (this.shown) {	
-					this.$el.find('.portlet-content').css('display', 'none');
-					this.$el.find('.toggle').text('Show Calls Waiting');
-					this.shown = false;
-					this.$el.resizable('destroy');
-					this.$el.css('height','auto');
-				} else {
 					this.$el.find('.portlet-content').css('display', 'block');
 					this.$el.find('.toggle').text('Hide Calls Waiting');
-					this.shown = true;
 					this.$el.resizable({ handles:'s' });
-				}
-			},
+				} else {
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Calls Waiting');
+					this.$el.css('height','auto');
+					
+          //Causes error if attempt to destroy before creating, just ignore
+          try {
+            this.$el.resizable('destroy');
+				  } catch (err) {}
+        }
+
+      }
 		});
 
 		var SummaryStatsWidget = bb.View.extend({
@@ -106,20 +163,31 @@
 			},
 
 			initialize: function() {
-				this.shown = true;
+				this.shown = localStorage.getItem('showSummaryStats') || true;
+        
+        //localStorage saves everything as strings, so convert to bool
+        if (this.shown == "false") {
+          this.shown = false;
+        }
+
+        this.update();
 			},
 
 			toggle: function(ev) {
+			  this.shown = !this.shown;
+        localStorage.setItem('showSummaryStats', this.shown);
+        this.update();
+      },
+
+      update: function() {
 				if (this.shown) {	
-					this.$el.find('.portlet-content').css('display', 'none');
-					this.$el.find('.toggle').text('Show Summary Stats');
-					this.shown = false;
-				} else {
 					this.$el.find('.portlet-content').css('display', 'block');
 					this.$el.find('.toggle').text('Hide Summary Stats');
-					this.shown = true;
+				} else {
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Summary Stats');
 				}
-			},
+      }
 		});
 
 		var UserOptions = bb.View.extend({
@@ -158,14 +226,37 @@
 					//init the group options
 					this.updateGroupOptions();
 				}
+
+        //Setup display options
+        var display = localStorage.getItem('display');
+
+        if (display) {
+          $('#options-display').val(display);  
+        }
+
+        //init the display options
+        this.updateDisplayOptions();
 			},
 
 			events: {
 				'click #options-campaigns' : 'updateCampaignOptions',
 				'click #options-groups' : 'updateGroupOptions',
 				'click #show-all-campaigns' : 'showAllCampaigns',
-				'click #show-all-groups' : 'showAllUserGroups'
-			},
+				'click #show-all-groups' : 'showAllUserGroups',
+			  'change #options-display' : 'updateDisplayOptions'
+      },
+      
+      updateDisplayOptions: function(ev) {
+        var display = $('#options-display').val();
+        
+        if (display) {
+          localStorage.setItem('display', display);
+          $('body').removeClass().addClass(display);
+        } else {
+          //Set default value for display
+          localStorage.setItem('display', 'Normal');
+        }
+      },
 
 			updateCampaignOptions: function(ev) {
 				var campaigns = $('#options-campaigns').val();
