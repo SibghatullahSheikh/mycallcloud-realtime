@@ -594,19 +594,20 @@
 				socket.emit('client.ready', function(data)
 				{
 					self.renderStats(data.stats);
-					self.calls.add(data.calls);
+          self.calls.add(data.calls);
 					self.users.add(data.users);
+					self.renderStatus();
 				});
 
 				socket.on('stats.changed', function(stats)
 				{
 					self.renderStats(stats);
+          self.renderStatus();
 				});
 
 
 				socket.on('users.add', function(user)
 				{
-					
 					self.users.add(user, { merge: true });
 				});
 
@@ -658,7 +659,114 @@
 					view.render();
 				});
 			},
-			
+		  
+      renderStatus: function() {
+        console.log('calls: \n' + JSON.stringify(this.calls));    
+        console.log('agents: \n' + JSON.stringify(this.users));    
+      
+				//grab the options	
+				var groups = localStorage.getItem('groups');
+				var campaigns = localStorage.getItem('campaigns');
+
+        //Agent Counters
+        var agentsLoggedIn = 0;
+        var agentsWaiting = 0;
+        var agentsPaused = 0;
+        var agentsInCalls = 0;
+        var agentsInDispo = 0;
+        var agentsInDeadCalls = 0;
+
+        for (var i=0;i<this.users.length;i++) {
+          if ((inGroup(this.users.at(i).get('group'))) && (inCampaign(this.users.at(i).get('campaign')))) {
+            agentsLoggedIn++;
+          
+            var status = this.users.at(i).get('status');
+            
+            if (status === 'READY') {
+              agentsWaiting++;
+            } else if (status === 'PAUSED') {
+              agentsPaused++;
+            } else if (status === 'INCALL') {
+              agentsInCalls++;
+            }
+            
+            if (status === 'READY' || status === 'PAUSED') {
+              if (this.users.at(i).get('lead_id') > 0) {
+                agentsInDispo++;
+              }
+            }
+
+            var callerId = this.users.at(i).get('callerid');
+
+            if (callerId) {
+              var call = this.calls.findWhere({ callerid: callerId });
+              
+              if (!call) {
+                agentsInDeadCalls++;
+              }
+            }
+          }
+        }
+        
+        console.log('Agents Logged In: ' + agentsLoggedIn);
+        console.log('Agents Waiting: ' + agentsWaiting);
+        console.log('Agents Paused: ' + agentsPaused);
+        console.log('Agents in Calls: ' + agentsInCalls);
+        console.log('Agents in Dispo: ' + agentsInDispo);
+        console.log('Agents in Dead calls: ' + agentsInDeadCalls);
+
+        
+        //Call Counters
+        var callsRinging = 0;
+        var callsActive = 0;
+        var callsWaiting = 0;
+
+        for (var i=0;i<this.calls.length;i++) {
+          if (inCampaign(this.calls.at(i).get('campaign'))) {
+            callsActive++;
+          
+            var status = this.calls.at(i).get('status');
+            
+            if (status === 'SENT') {
+              callsRinging++;
+            } else if (status === 'XFER') {
+              callsWaiting++;
+            }
+          }
+        }
+        
+        console.log('Calls Active: ' + callsActive);
+        console.log('Calls Ringing: ' + callsRinging);
+        console.log('Calls Waiting: ' + callsWaiting);
+
+
+        function inGroup(group) {
+          //check if the model belongs to the filtered groups
+          if (groups) {
+            if (groups.split(',').indexOf(group) === -1) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        }
+      
+        function inCampaign(campaign) {
+          //check if model belongs to the filtered campaigns
+          if (campaigns) {
+            if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(campaign) === -1)) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        }
+      },
+
 			renderStats: function(stats)
 			{
 				for(var key in stats)
