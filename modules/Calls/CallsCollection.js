@@ -72,11 +72,6 @@ module.exports = function(mysql)
 					}
 				}
 
-				
-				//filter to only use the selected campaigns
-				//var campaigns = ['SIC', 'CCSV'] 
-				//results = _.filter(results, function(call) { return campaigns.indexOf(call.campaign) > -1;});
-
 				for(var i=0; i<models.length; i++) {
 
 					if( result = _.findWhere(results, { id: models[i].id }) ) {

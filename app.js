@@ -44,7 +44,12 @@ var agi = new Agi({
   password  : '1234'
 });
 
-
+var CampaignsController = require('./controllers/campaigns/CampaignsController');
+var campaignsController = new CampaignsController(mysql);
+var CallsController = require('./controllers/calls/CallsController');
+var callsController = new CallsController(mysql);
+var AgentsController = require('./controllers/agents/AgentsController');
+var agentsController = new AgentsController(mysql);
 
 /**
  * All Environment Settings
@@ -77,14 +82,6 @@ app.configure('development', function(){
 });
 
 
-
-var
-  RealtimeApp = require('./modules/AppModel')(mysql),
-  App         = new RealtimeApp()
-;
-
-
-
 var basicAuth = express.basicAuth(function(user, pass, cb)
 {
   var query = 'SELECT u.user, u.pass, u.phone_pass, u.phone_login, p.server_ip, p.conf_secret, a.server_ip AS agent_server_ip FROM vicidial_users u LEFT JOIN phones p ON u.phone_login = p.login LEFT JOIN vicidial_live_agents a ON a.user = u.user WHERE u.user=? AND u.pass=? AND u.user_level > 7 && u.active="Y"; SELECT external_server_ip FROM servers WHERE server_ip="192.168.100.51";';
@@ -102,73 +99,116 @@ var basicAuth = express.basicAuth(function(user, pass, cb)
   });
 });
 
-var auth = function(req, res, next)
-{
-  basicAuth(req, res, function(err)
-  {
-    if(!err)
-    {
+var auth = function(req, res, next) {
+  basicAuth(req, res, function(err) {
+    if(!err) {
       req.session.user = req.user;
-	  next();
+	    next();
+    } else {
+      res.send('Authentication failed');
     }
   });
 };
 
-
 var permissions = function(req, res, next) {
+  var group;
+  var groups;
+  var campaigns;
 
-	var query = 'SELECT user_group ' +
-				'FROM vicidial_users ' +
-				'WHERE user="' + req.session.user.user + '";';
-	
-	mysql.query(query, function(err, results) {
-		if (err) {
-			console.log('MySQL Error: ' + err);
-			req.session.campaigns = [];
-			req.session.groups = [];
-			next();
-		} else {
-			var group = results[0].user_group || '';
-			
-			query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
-					'FROM vicidial_user_groups ' +
-					'WHERE user_group = "' + group + '";';
-			
-			mysql.query(query, function(err, results) {
-				if (err) {
-					console.log('MySQL Error: ' + err);
-					req.session.campaigns = [];
-					req.session.groups = [];
-					next();
-				} else {
-					//Save the campaigns
-					var campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
-					
-					//Remove the erroneous '-' campaign value
-					campaigns = _.reject(campaigns, function(campaign){ return campaign == '-'; });
-					req.session.campaigns = campaigns;
+  if ('groups' in req.session && 'campaigns' in req.session) {
+    console.log('Using previously set group and campaign permissions');
+    next();
+  } else {
+    //start the chain
+    getUserGroup();
+  }
 
-					//Save the groups
-					req.session.groups = results[0].admin_viewable_groups.trim() || [];
-					
-					if (req.session.groups === '---ALL---') {
-						//Get the list of available groups
-						var query = 'SELECT DISTINCT user_group FROM vicidial_users;';
+  function getUserGroup() {
+    console.log('Getting User Group');
+    var query = 'SELECT user_group ' +
+          'FROM vicidial_users ' +
+          'WHERE user="' + req.session.user.user + '";';
+    
+    mysql.query(query, function(err, results) {
+      if (err) {
+        console.error('MySQL Error: ' + err);
+        req.session.campaigns = [];
+        req.session.groups = [];
+        next();
+      } else {
+        group = results[0].user_group || '';
+        getAllowed();
+      }
+    });
+  }
 
-						mysql.query(query, function(err, results) {
-							req.session.groups = _.without(_.pluck(results, 'user_group'), '---ALL---', 'ADMIN', 'zADMIN');
-							next();
-						});
-					} else if (req.session.groups == '') {
-						req.session.groups = [group];
-						next();
-					} else {
-						next();
-					}
-				}
-			});
-		}
-	});
+  function getAllowed() {
+    console.log('requesting allowed campaigns and groups');
+    query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
+        'FROM vicidial_user_groups ' +
+        'WHERE user_group = "' + group + '";';
+    
+    mysql.query(query, function(err, results) {
+      if (err) {
+        console.error('MySQL Error: ' + err);
+        req.session.campaigns = [];
+        req.session.groups = [];
+        next();
+      } else {
+        //Save the campaigns
+        campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
+        
+        //Remove the erroneous '-' campaign value
+        campaigns = _.reject(campaigns, function(campaign){ return campaign == '-'; });
+       
+        //Save the groups
+        groups = results[0].admin_viewable_groups.trim() || [];
+        
+        //Check the groups, and then check the campaigns
+        checkGroups();
+      }
+    });
+  }
+  
+  function checkGroups() {
+    if (groups === '---ALL---') {
+      console.log('Getting unique user_groups');
+      var query = 'SELECT DISTINCT user_group FROM vicidial_users;';
+      mysql.query(query, function(err, results) {
+        req.session.groups = _.without(_.pluck(results, 'user_group'), '---ALL---', 'ADMIN', 'zADMIN');
+        checkCampaigns();
+      });
+    } else if (req.session.groups == '') {
+      req.session.groups = [group];
+      checkCampaigns();
+    } else {
+      req.session.groups = groups;
+      checkCampaigns();
+    }
+  }
+  
+  function checkCampaigns() {
+    if (campaigns[0] === '-ALL-CAMPAIGNS-') {
+      console.log('Getting distinct campaigns');
+      var query = 'SELECT DISTINCT campaign_id ' +
+                  'FROM vicidial_campaign_stats ' +
+                  'WHERE calls_today > 10';
+      
+      mysql.query(query, function(err, results) {
+        if (err) {
+          console.error('MySQL Error: ' + err);
+          req.session.campaigns = [];
+          next();
+        } else {
+          req.session.campaigns = _.pluck(results, 'campaign_id'); 
+          next();
+        }
+      });
+    } else {
+      req.session.campaigns = campaigns;
+      next();
+    }
+  }
 };
 
 
@@ -177,29 +217,17 @@ var permissions = function(req, res, next) {
  */
 app.get('/', auth, permissions, function(req, res)
 {
-	console.log('Campaigns: ' + req.session.campaigns);
-	console.log('Groups: ' + req.session.groups);
-
 	res.render('index', {
 		user: req.session.user,
-		data: {
-			users     : App.users.toJSON(),
-			calls     : App.calls.toJSON(),
-			campaigns : App.users.toJSON()
-		},
 		campaigns: req.session.campaigns, 
 		groups: req.session.groups,
-	});
+	  customURL: 'http://amazon.com'
+  });
 });
 
 app.get('/resources', auth, permissions, function(req, res) {
 	res.render('resources', {
 		user: req.session.user,
-		data: {
-			users: App.users.toJSON(),
-			calls: App.calls.toJSON(),
-			campaigns: App.users.toJSON()
-		},
 		campaigns: req.session.campaigns, 
 		groups: req.session.groups,
 	});
@@ -217,8 +245,9 @@ app.get('/spy', function(req, res)
   return res.send('');
 });
 
-
-
+app.get('/api/campaigns', campaignsController.read);
+app.get('/api/calls', callsController.read);
+app.get('/api/agents', agentsController.read);
 
 
 /**
@@ -260,8 +289,7 @@ io.sockets.on('connection', function (socket)
     hs      = socket.handshake,
     session = hs.session,
     user    = session.user
-  ;
-// console.log('SOCKET', user);
+  
   socket.on('coach', function(data, cb)
   {
     agi.connect(function()
@@ -317,52 +345,7 @@ io.sockets.on('connection', function (socket)
 
     request.post(url).form(data);
   });
-
-  socket.on('client.ready', function(cb)
-  {
-    cb({
-      stats     : App.toJSON(),
-      users     : App.users.toJSON(),
-      calls     : App.calls.toJSON()
-    });
-  });
-
-  // App.on('change', function()
-  // {
-  //   socket.emit( 'stats.changed', App.toJSON() );
-  // });
-
-  // App.users.on('all', function(action, user)
-  // {
-  //   if(user.id==1945){ console.log('Noah', action); }
-  //   socket.emit( 'users.' + action, user.toJSON() );
-  // });
-
-  // App.calls.on('all', function(action, call)
-  // {
-  //   socket.emit('calls.' + action, call.toJSON());
-  // });
-
 });
-
-
-
-App.on('change', function()
-{
-  io.sockets.emit( 'stats.changed', App.toJSON() );
-});
-
-App.users.on('all', function(action, user)
-{
-  io.sockets.emit( 'users.' + action, user.toJSON() );
-});
-
-App.calls.on('all', function(action, call)
-{
-  io.sockets.emit('calls.' + action, call.toJSON());
-});
-
-
 
 
 /**

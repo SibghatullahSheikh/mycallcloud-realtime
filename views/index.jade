@@ -23,34 +23,34 @@ block content
   
     .col-lg-12#content
       .column
-        .portlet#summary-statistics-widget
+        .portlet#campaign-stats-widget
           .portlet-header
-            h2 Summary Statistics
-            button.btn-link.toggle Hide Summary Stats
+            h2 Campaign Statistics
+            button.btn-link.toggle Hide Campaign Stats
           .portlet-content
             hr
             .row(style='text-align:center;')
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Dropped %
-                .stat-number(data-stat='dropped_pct')
+                .stat-number#campaign-stats-dropped-percentage
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Calls Today
-                .stat-number(data-stat='calls_today')
+                .stat-number#campaign-stats-calls-today
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Agent Average Wait
-                .stat-number(data-stat='agent_avg_wait')
+                .stat-number#campaign-stats-average-wait
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Average Talk Time
-                .stat-number(data-stat='average_talk_time')
+                .stat-number#campaign-stats-average-talk
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Average Wrap
-                .stat-number(data-stat='average_wrap')
+                .stat-number#campaign-stats-average-wrap
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Average Pause
-                .stat-number(data-stat='average_pause')
+                .stat-number#campaign-stats-average-pause
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Dialable Leads
-                .stat-number(data-stat='dialable_leads')
+                .stat-number#campaign-stats-dialable-leads
 
         .portlet#current-status-widget
           .portlet-header 
@@ -60,32 +60,32 @@ block content
             hr
             .row(style='text-align:center;')
               .col-lg-3.col-sm-6.col-xs-12
-                .stat-header Agents Waiting
-                .stat-number(data-stat="agents_waiting")
-              .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Agents Logged In
-                .stat-number(data-stat="agents_logged_in")
+                .stat-number#status-agents-logged-in
               .col-lg-3.col-sm-6.col-xs-12
-                .stat-header Paused Agents
-                .stat-number(data-stat="paused_agents")
+                .stat-header Agents Waiting
+                .stat-number#status-agents-waiting
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents Paused
+                .stat-number#status-agents-paused
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Agents In Calls
-                .stat-number(data-stat="agents_in_calls")
-              .col-lg-3.col-sm-6.col-xs-12
-                .stat-header Calls Ringing
-                .stat-number(data-stat="calls_ringing")
-              .col-lg-3.col-sm-6.col-xs-12
-                .stat-header Current Active Calls
-                .stat-number(data-stat="current_active_calls")
-              .col-lg-3.col-sm-6.col-xs-12
-                .stat-header Calls Waiting for Agents
-                .stat-number(data-stat="calls_waiting_for_agents")
+                .stat-number#status-agents-in-calls
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Agents in Dead Calls
-                .stat-number(data-stat="agents_in_dead_calls")
+                .stat-number#status-agents-in-dead-calls
               .col-lg-3.col-sm-6.col-xs-12
                 .stat-header Agents in Dispo
-                .stat-number(data-stat="agents_in_dispo")
+                .stat-number#status-agents-in-dispo
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Call Active 
+                .stat-number#status-calls-active
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Ringing
+                .stat-number#status-calls-ringing
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Waiting
+                .stat-number#status-calls-waiting
 
         .portlet#calls-waiting-widget
           .portlet-header 
@@ -106,9 +106,78 @@ block content
         .portlet#active-resources-widget
           .portlet-header 
             h2 Active Resources
-            button.btn-link.toggle Hide Active Resources
-            | |  
-            a(href='/resources',target='_blank', style='margin-bottom:25px;') Open in new tab
+            .pull-left
+              button.btn-link.toggle Hide Active Resources
+              | |  
+              a(href='/resources',target='_blank', style='margin-bottom:25px;') Open in new tab
+            .pull-right
+              button.btn-link.notifications Disable Notifications
+              | | 
+              button.dropdown.btn-link
+                a.dropdown-toggle(href='#', data-toggle='dropdown') Key
+                  span.caret
+                .dropdown-menu.pull-right.notifications-key(role='menu')
+                  .pull-left(style='text-align:left;')
+                    .clearfix
+                    
+                    -spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                    span.notification-ready 
+                      != spaces 
+                    |  Agent ready
+                    br
+                    span.notification-ready-warning 
+                      != spaces 
+                    |  Agent ready > 1 minute
+                    br
+                    span.notification-ready-danger 
+                      != spaces 
+                    |  Agent ready > 5 minutes
+                    br
+                    span.notification-paused 
+                      != spaces 
+                    |  Agent paused
+                    br
+                    span.notification-paused-warning 
+                      != spaces 
+                    |  Agent paused > 1 minute
+                    br
+                    span.notification-paused-danger 
+                      != spaces 
+                    |  Agent paused > 5 minutes
+                    br
+                    span.notification-incall 
+                      != spaces 
+                    |  Agent in call
+                    br
+                    span.notification-incall-warning 
+                      != spaces 
+                    |  Agent in call > 1 minute
+                    br
+                    span.notification-incall-danger 
+                      != spaces 
+                    |  Agent in call  > 5 minutes
+                    br
+                    span.notification-3way
+                      != spaces 
+                    |  Agent in 3 way
+                    br
+                    span.notification-indeadcall
+                      != spaces 
+                    |  Agent in dead call
+                    br
+
+          .clearfix
+          
           .portlet-content
             hr
             include _resources-table
+        
+        
+        .portlet#custom-widget
+          .portlet-header 
+            h2 Custom Widget
+            button.btn-link.toggle Hide Custom Widget
+          .portlet-content 
+            hr
+            iframe(src='#{customURL}', height='100%', width='100%')
+

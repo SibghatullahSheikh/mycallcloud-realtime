@@ -26,15 +26,17 @@ module.exports = function(mysql)
 		getStats: function(cb)
 		{
 			var self = this;
+      var query = 'SELECT *, campaign_id as id ' +
+                  'FROM vicidial_campaign_stats ' +
+                  'WHERE calls_today > 10';
 
-			mysql.query('SELECT *, campaign_id AS id FROM vicidial_campaign_stats;', function(err, results)
+			mysql.query(query, function(err, results)
 			{
 				if(err)
 				{
 					console.log('Get Campaign Stats SQL Error:', err);
 					return;
 				}
-
 				for(var i=0; i<results.length; i++)
 				{
 					self.add(results[i], { merge: true });

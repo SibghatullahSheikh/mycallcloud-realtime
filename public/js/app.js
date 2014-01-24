@@ -5,7 +5,7 @@
 	//doc ready
 	$(function()
 	{
-		var Container = bb.View.extend({
+		var ContainerView = bb.View.extend({
 			
 			el:$('.column'),
 
@@ -33,7 +33,7 @@
       }			
 		});
 
-		var CurrentStatusWidget = bb.View.extend({
+		var CurrentStatusWidgetView = bb.View.extend({
 			el: $('#current-status-widget'),
 
 			events: {
@@ -58,7 +58,6 @@
       },
 
       update: function() {
-        console.log("Update: " + this.shown);
 				if (this.shown) {	
 					this.$el.find('.portlet-content').css('display', 'block');
 					this.$el.find('.toggle').text('Hide Current Status');
@@ -69,19 +68,25 @@
       },
 		});
 
-		var ActiveResourcesWidget = bb.View.extend({
+		var ActiveResourcesWidgetView = bb.View.extend({
 			el: $('#active-resources-widget'),
 
 			events: {
-				'click .toggle': 'toggle'
-			},
+				'click .toggle': 'toggle',
+			  'click .notifications' : 'notifications'
+      },
 
 			initialize: function() {
 				this.shown = localStorage.getItem('showActiveResources') || true;
-        
+        this.enableNotifications = localStorage.getItem('enableNotifications') || true;
+
         //localStorage saves everything as strings, so convert to bool
-        if (this.shown == "false") {
+        if (this.shown == 'false') {
           this.shown = false;
+        }
+        
+        if (this.enableNotifications == 'false') {
+          this.enableNotifications = false;
         }
 
         this.update();
@@ -93,6 +98,13 @@
         this.update();
       },
 			
+      notifications: function() {
+        this.enableNotifications = !this.enableNotifications;
+        console.log('Notifications', this.enableNotifications);
+        localStorage.setItem('enableNotifications', this.enableNotifications);
+        this.update();
+      },
+
       update: function() {
 				if (this.shown) {	
 					this.$el.find('.portlet-content').css('display', 'block');
@@ -109,10 +121,19 @@
           }
           catch(err) {}
 				}
+
+        if (this.enableNotifications) {
+          this.$el.find('.notifications').text('Disable Notifications');
+          this.$el.find('#resourcesTable').removeClass('table-striped');
+        } else {
+          this.$el.find('.notifications').text('Enable Notifications');
+          this.$el.find('#resourcesTable').addClass('table-striped');
+          this.$el.find('tr').removeClass();
+        }
       }
 		});
 
-		var CallsWaitingWidget = bb.View.extend({
+		var CallsWaitingWidgetView = bb.View.extend({
 			el: $('#calls-waiting-widget'),
 
 			events: {
@@ -155,8 +176,58 @@
       }
 		});
 
-		var SummaryStatsWidget = bb.View.extend({
-			el: $('#summary-statistics-widget'),
+		var CustomWidgetView = bb.View.extend({
+			el: $('#custom-widget'),
+
+			events: {
+				'click .toggle': 'toggle'
+			},
+
+			initialize: function() {
+        var self = this;
+
+				this.shown = localStorage.getItem('showCustom') || true;
+        
+        //localStorage saves everything as strings, so convert to bool
+        if (this.shown == "false") {
+          this.shown = false;
+        }
+        this.$el.resize(function() {
+          console.log('widget resized!', self.$el.height());
+          self.$el.find('iframe').attr('height', self.$el.height() - 140);
+        });
+
+        this.update();
+			},
+
+			toggle: function(ev) {
+			  this.shown = !this.shown;
+        localStorage.setItem('showCustom', this.shown);
+        this.update()
+      },
+
+      update: function() {
+				if (this.shown) {	
+					this.$el.find('.portlet-content').css('display', 'block');
+					this.$el.find('.toggle').text('Hide Custom Widget');
+					this.$el.resizable({ handles:'s' });
+				} else {
+					this.$el.find('.portlet-content').css('display', 'none');
+					this.$el.find('.toggle').text('Show Custom Widget');
+					this.$el.css('height','auto');
+					
+          //Causes error if attempt to destroy before creating, just ignore
+          try {
+            this.$el.resizable('destroy');
+				  } catch (err) {}
+        }
+
+      }
+		});
+
+
+		var CampaignStatsWidgetView = bb.View.extend({
+			el: $('#campaign-stats-widget'),
 
 			events: {
 				'click .toggle': 'toggle'
@@ -310,40 +381,36 @@
 		/**
 		 * Calls Waiting
 		 */
-		var Call = bb.Model.extend({});
-		var CallCollection = bb.Collection.extend({});
-		var CallView = bb.View.extend({
-			
-			tagName: 'tr',
-			template: _.template($('#call-template').html()),
-			
-			events: {
-				
-			},
-			
-			initialize: function()
-			{
-				this.callsTable = $('#callsTable');
+		var CallModel = bb.Model.extend();
+		
+    var CallsCollection = bb.Collection.extend({
+      model: CallModel,
 
+      url: '/api/calls'
+    });
+		
+    
+    var CallView = bb.View.extend({
+      template: _.template($('#call-template').html()),
+			
+			initialize: function(model) {
+        this.model = model;
 				this.listenTo(this.model, 'change', this.change);
-				this.listenTo(this.model, 'add', this.render);
 				this.listenTo(this.model, 'remove', this.remove);
 			
-				this.updateTable = _.debounce(function() {
-					this.callsTable.trigger('update');
+        this.updateTable = _.debounce(function() {
+					$('#callsTable').trigger('update');
 				}, 1000);
 
 				this.sortTable = _.debounce(function() {
-					this.callsTable.find('thead th:eq(2)').trigger('sort');
+					$('#callsTable').find('thead th:eq(2)').trigger('sorton',[2,1]);
 				}, 2000);
+			  
+        this.render();
+      },
 
-			},
-
-			render: function()
-			{
-				if( this.model.get('status') !== 'XFER')
-				{
-					this.remove();
+			render: function() {
+				if(this.model.get('status') !== 'XFER') {
 					return;
 				}
 				
@@ -355,45 +422,255 @@
 						return;
 					}
 				}
-
-				this.$el.html(this.template(this.model.toJSON()));
-				this.callsTable.append( this.$el );
+        this.setElement('<tr>' + this.template(this.model.toJSON()) + '</tr>');
+        $('#callsTable').find('tbody').append(this.$el);
 				
 				//Update the table and sort on the time on hold column
 				this.updateTable();
 				this.sortTable();
-
-				$('[title]').tooltip();
-				
-				return this;
 			},
 
-			change: function()
-			{
-				if (!this.$el) return;
-
-				this.$el.html(this.template(this.model.toJSON()));
-				return this;
-			},
+			change: function(model) {
+        this.$el.html(this.template(this.model.toJSON()));
+				this.updateTable();
+				this.sortTable();
+      },
 			
-			remove: function()
-			{
-				if(!this.$el) return;
-				
-				this.$el.remove();
-				this.el = null;
-				this.$el = null;
-			}
-
+			remove: function(model) {
+        this.$el.remove();
+				this.updateTable();
+				this.sortTable();
+      }
 		});
+    
+    /**
+    * Current Status
+    */
+    var CurrentStatusView = bb.View.extend({
+      el: $('#current-status-widget'),
 
+      initialize: function(agentsCollection, callsCollection) {
+        this.agents = agentsCollection;
+        this.calls = callsCollection;
+        this.listenTo(this.agents, 'change reset add remove', this.render);
+        this.listenTo(this.calls, 'change reset add remove', this.render);
+        this.render();
+      },
+
+      render: function() {
+				//grab the options	
+				var groups = localStorage.getItem('groups');
+				var campaigns = localStorage.getItem('campaigns');
+
+        //Agent Counters
+        var agentsLoggedIn = 0;
+        var agentsWaiting = 0;
+        var agentsPaused = 0;
+        var agentsInCalls = 0;
+        var agentsInDispo = 0;
+        var agentsInDeadCalls = 0;
+
+        for (var i=0;i<this.agents.length;i++) {
+          if ((inGroup(this.agents.at(i).get('group'))) && (inCampaign(this.agents.at(i).get('campaign')))) {
+            agentsLoggedIn++;
+          
+            var status = this.agents.at(i).get('status');
+            
+            if (status === 'READY') {
+              agentsWaiting++;
+            } else if (status === 'PAUSED') {
+              agentsPaused++;
+            } else if (status === 'INCALL') {
+              agentsInCalls++;
+            }
+            
+            if (status === 'READY' || status === 'PAUSED') {
+              if (this.agents.at(i).get('lead_id') > 0) {
+                agentsInDispo++;
+              }
+            }
+
+            var callerId = this.agents.at(i).get('callerid');
+
+            if (callerId) {
+              var call = this.calls.findWhere({ callerid: callerId });
+              
+              if (!call) {
+                agentsInDeadCalls++;
+              }
+            }
+          }
+        }
+
+        //Call Counters
+        var callsRinging = 0;
+        var callsActive = 0;
+        var callsWaiting = 0;
+
+        for (var i=0;i<this.calls.length;i++) {
+          if (inCampaign(this.calls.at(i).get('campaign'))) {
+            callsActive++;
+          
+            var status = this.calls.at(i).get('status');
+            
+            if (status === 'SENT') {
+              callsRinging++;
+            } else if (status === 'XFER') {
+              callsWaiting++;
+            }
+          }
+        }
+        
+        //Update the status
+        this.$el.find('#status-agents-logged-in').text(agentsLoggedIn);
+        this.$el.find('#status-agents-waiting').text(agentsWaiting);
+        this.$el.find('#status-agents-paused').text(agentsPaused);
+        this.$el.find('#status-agents-in-calls').text(agentsInCalls);
+        this.$el.find('#status-agents-in-dispo').text(agentsInDispo);
+        this.$el.find('#status-agents-in-dead-calls').text(agentsInDeadCalls);
+        this.$el.find('#status-calls-active').text(callsActive);
+        this.$el.find('#status-calls-ringing').text(callsRinging);
+        this.$el.find('#status-calls-waiting').text(callsWaiting);
+        
+        function inGroup(group) {
+          //check if the model belongs to the filtered groups
+          if (groups) {
+            if (groups.split(',').indexOf(group) === -1) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        }
+      
+        function inCampaign(campaign) {
+          //check if model belongs to the filtered campaigns
+          if (campaigns) {
+            if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(campaign) === -1)) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        }
+      }
+    });
+
+
+
+    /**
+    * Campaign Stats
+    */
+    var CampaignModel = bb.Model.extend({
+      defaults: {
+        calls_today: 0,
+        drops_today: 0,
+        answers_today: 0,
+        dispo_today: 0,
+        dialable_leads: 0,
+        agent_calls_today: 0,
+        agent_pause_today: 0,
+        agent_custtalk_today: 0,
+        agent_wait_today: 0
+      }
+    });
+    
+    var CampaignsCollection = bb.Collection.extend({
+      model: CampaignModel,
+
+      url: '/api/campaigns',
+    });
+
+    var CampaignsView = bb.View.extend({
+      el: $('#campaign-stats-widget'),
+
+      initialize: function(collection) {
+        this.collection = collection;
+        this.listenTo(this.collection, 'add', this.render);
+        this.listenTo(this.collection, 'change', this.render);
+        this.render();
+      },
+
+      render: function() {
+        var campaigns = localStorage.getItem('campaigns');
+        
+        //Init Counter Variables
+        var callsToday = 0;
+        var dispoToday = 0;
+        var dropsToday = 0;
+        var answersToday = 0;
+        var agentPauseToday = 0;
+        var agentTalkToday = 0;
+        var dialableLeads = 0;
+        var agentWaitToday = 0; 
+        var agentCallsToday = 0;
+
+        //Loop through the collection and count the fields of the filtered campaigns
+        for(var i=0;i<this.collection.length;i++) {
+          //check if this collections campaign is selected by the filter
+          if (inCampaign(this.collection.at(i).get('id'))) {
+            //Increment Counters
+            callsToday += this.collection.at(i).get('calls_today'); 
+            dropsToday += this.collection.at(i).get('drops_today');
+            answersToday += this.collection.at(i).get('answers_today');
+            dialableLeads += this.collection.at(i).get('dialable_leads');
+            agentCallsToday += this.collection.at(i).get('agent_calls_today');
+            agentPauseToday += this.collection.at(i).get('agent_pause_today');
+            agentTalkToday += this.collection.at(i).get('agent_custtalk_today');
+            agentWaitToday += this.collection.at(i).get('agent_wait_today');
+            dispoToday += this.collection.at(i).get('dispo_today');
+          }
+        }
+       
+        //Calucalate derived stats
+        var averageWait = Math.round((agentWaitToday / agentCallsToday) || 0);
+        var averagePause = Math.round((agentPauseToday / agentCallsToday) || 0);
+        var averageTalk = Math.round((agentTalkToday / agentCallsToday) || 0);
+        var averageWrap = Math.round((dispoToday / agentCallsToday) || 0); 
+        var droppedPercentage = Math.round((100 * (dropsToday / answersToday)) || 0);
+
+        //Update the view
+        this.$el.find('#campaign-stats-calls-today').text(callsToday);
+        this.$el.find('#campaign-stats-dialable-leads').text(dialableLeads);
+        this.$el.find('#campaign-stats-average-wait').text(averageWait);
+        this.$el.find('#campaign-stats-average-pause').text(averagePause);
+        this.$el.find('#campaign-stats-average-talk').text(averageTalk);
+        this.$el.find('#campaign-stats-average-wrap').text(averageWrap);
+        this.$el.find('#campaign-stats-dropped-percentage').text(droppedPercentage);
+
+
+        function inCampaign(campaign) {
+          //check if model belongs to the filtered campaigns
+          if (campaigns) {
+            if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(campaign) === -1)) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return true;
+          }
+        }
+      },
+    });
+   
 
 		/**
 		 * Active Resources
 		 */
-		var User = bb.Model.extend({});
-		var UsersCollection = bb.Collection.extend({});
-		var UserView = bb.View.extend({
+		var AgentModel = bb.Model.extend();
+
+		var AgentsCollection = bb.Collection.extend({
+      model: AgentModel,
+
+      url: 'api/agents'
+    });
+    
+    var AgentView = bb.View.extend({
 
 			tagName: 'tr',
 			
@@ -405,8 +682,11 @@
 				'click [data-barge]'   : 'barge'
 			},
 			
-			initialize: function()
+			initialize: function(model, callsCollection)
 			{
+        this.model = model;
+        this.calls = callsCollection;
+
 				this.usersTable = $('#resourcesTable');
 					
 				this.listenTo(this.model, 'change', this.change);
@@ -415,7 +695,9 @@
 				this.updateTable = _.debounce(function() {
 					this.usersTable.trigger('update');
 				}, 1000);
-			},
+			
+        this.render();
+      },
 
 			render: function()
 			{	
@@ -433,7 +715,7 @@
 				//check if the user belongs to the filtered groups
 				if (groups) {
 					if (groups.split(',').indexOf(this.model.get('group')) === -1) {
-						return;
+					return;
 					}
 				} 
 
@@ -447,21 +729,20 @@
 				//Update the table for sorting
 				this.updateTable();
 
-				$('[title]').tooltip();
+        this.updateNotification();
+				
+        $('[title]').tooltip();
 
 				return this;
 			},
 
 			formatTime: function(time)
 			{
-				var 
-					hours = 0,
-					mins = time / 60,
-					secs = time % 60
-				;
+				var hours = 0;
+				var	mins = time / 60;
+			  var		secs = time % 60;
 
-				if(mins > 60)
-				{
+				if(mins > 60) {
 					hours = mins / 60;
 					mins = mins % 60;
 					secs = mins % 60;
@@ -490,6 +771,8 @@
 				//Update the table for sorting
 				this.updateTable();
 				
+        this.updateNotification();
+
 				return this;
 			},
 
@@ -497,6 +780,61 @@
 			{
 				this.$el.remove();
 			},
+      
+      updateNotification: function() {
+        //Find the element
+        var el = $('tr#' + this.model.get('id'));
+        
+        //First, remove all classes to reset the notification
+        el.removeClass();
+        
+        //Check if notifications are enabled
+        var enabled = localStorage.getItem('enableNotifications') || true;
+        
+        if (enabled == 'false') {
+          enabled = false;
+        }
+
+        if (enabled) {
+          if (this.model.get('status') == 'PAUSED') {
+            if (this.model.get('time') > 5*60) {
+              el.addClass('notification-paused-danger');
+            } else if (this.model.get('time') > 1*60) {
+              el.addClass('notification-paused-warning');
+            } else {
+              el.addClass('notification-paused');
+            }
+          } else if (this.model.get('status') == 'READY') {
+            if (this.model.get('time') > 5*60) {
+              el.addClass('notification-ready-danger');
+            } else if (this.model.get('time') > 1*60) {
+              el.addClass('notification-ready-warning');
+            } else {
+              el.addClass('notification-ready');
+            }
+          } else if (this.model.get('status') == 'INCALL') {
+            var callerId = this.model.get('callerid');
+
+            if (callerId) {
+              var call = this.calls.findWhere({ callerid: callerId });
+            } else {
+              var call = false;
+            }
+           
+            if (!call) {
+              el.addClass('notification-indeadcall');
+            } else if (this.model.get('time') > 5*60) {
+              el.addClass('notification-incall-danger');
+            } else if (this.model.get('time') > 1*60) {
+              el.addClass('notification-incall-warning');
+            } else {
+              el.addClass('notification-incall');
+            }
+          } else if (this.model.get('status') == '3-WAY') {
+            el.addClass('notification-3way');
+          }
+        }
+      },
 
 			monitor: function()
 			{
@@ -571,15 +909,51 @@
 			initialize: function()
 			{
 				var self = this;
+        
+        //create the collections
+				this.callsCollection = new CallsCollection();
+				this.agentsCollection = new AgentsCollection();
+        this.campaignsCollection = new CampaignsCollection();
+				
+        
+        //Create the views
+				this.containerView = new ContainerView();
+				this.callsWaitingWidget = new CallsWaitingWidgetView();
+				this.summaryStatsWidget = new CampaignStatsWidgetView();
+				this.currentStatusWidget = new CurrentStatusWidgetView();
+				this.activeResourcesWidget = new ActiveResourcesWidgetView();
+				this.customWidget = new CustomWidgetView();
 
-				this.calls = new CallCollection();
-				this.users = new UsersCollection();
-				this.userOptions = new UserOptions();	
-				this.callsWaitingWidget = new CallsWaitingWidget();
-				this.summaryStatsWidget = new SummaryStatsWidget();
-				this.currentStatusWidget = new CurrentStatusWidget();
-				this.activeResourcesWidget = new ActiveResourcesWidget();
-				this.container = new Container();
+        this.userOptions = new UserOptions();	
+
+        this.campaignsView = new CampaignsView(this.campaignsCollection);
+        this.currentStatusView = new CurrentStatusView(this.agentsCollection, this.callsCollection);
+
+        this.listenTo(this.callsCollection, 'add', function(model) {
+          var view = new CallView(model);
+        });
+        
+        this.listenTo(this.agentsCollection, 'add', function(model) {
+          var view = new AgentView(model, this.callsCollection);
+        });
+
+        //initialize the collections 
+        self.callsCollection.fetch();
+        this.agentsCollection.fetch();
+        self.campaignsCollection.fetch();
+        
+        //Setup update intervals for the collecctions
+        setInterval((function() {
+          self.callsCollection.fetch();
+        }),1000*5);
+        
+        setInterval((function() {
+          self.agentsCollection.fetch();
+        }),1000*5);
+        
+        setInterval((function() {
+          self.campaignsCollection.fetch();
+        }),1000*60*5);
 
 				//Add sorting to the tables
 				$('#resourcesTable').tablesorter({ 
@@ -589,217 +963,10 @@
 				$('#callsTable').tablesorter({
 					theme: 'bootstrap', 
 				});
-
-
-				socket.emit('client.ready', function(data)
-				{
-					self.renderStats(data.stats);
-          self.calls.add(data.calls);
-					self.users.add(data.users);
-					self.renderStatus();
-				});
-
-				socket.on('stats.changed', function(stats)
-				{
-					self.renderStats(stats);
-          self.renderStatus();
-				});
-
-
-				socket.on('users.add', function(user)
-				{
-					self.users.add(user, { merge: true });
-				});
-
-				socket.on('users.remove', function(user)
-				{
-					self.users.remove(user);
-				});
-
-				socket.on('users.change', function(user)
-				{
-					self.users.add(user, { merge: true });
-				});
-
-
-				socket.on('calls.add', function(call)
-				{
-					self.calls.add(call, { merge: true });
-				});
-
-				socket.on('calls.remove', function(call)
-				{
-					self.calls.remove(call);
-				});
-				
-				socket.on('calls.change', function(call)
-				{
-					self.calls.add(call, { merge: true });
-				});
-			
-
-				socket.on('reconnecting', function(elapsed,attempts)
-				{
-					if(attempts > 3)
-					{
-						location.reload();
-					}
-				});
-
-
-				this.listenTo(this.users, 'add', function(model)
-				{
-					var view = new UserView({ model: model });
-					view.render();
-				});
-
-				this.listenTo(this.calls, 'add', function(model)
-				{
-					var view = new CallView({ model: model });
-					view.render();
-				});
-			},
-		  
-      renderStatus: function() {
-        console.log('calls: \n' + JSON.stringify(this.calls));    
-        console.log('agents: \n' + JSON.stringify(this.users));    
-      
-				//grab the options	
-				var groups = localStorage.getItem('groups');
-				var campaigns = localStorage.getItem('campaigns');
-
-        //Agent Counters
-        var agentsLoggedIn = 0;
-        var agentsWaiting = 0;
-        var agentsPaused = 0;
-        var agentsInCalls = 0;
-        var agentsInDispo = 0;
-        var agentsInDeadCalls = 0;
-
-        for (var i=0;i<this.users.length;i++) {
-          if ((inGroup(this.users.at(i).get('group'))) && (inCampaign(this.users.at(i).get('campaign')))) {
-            agentsLoggedIn++;
-          
-            var status = this.users.at(i).get('status');
-            
-            if (status === 'READY') {
-              agentsWaiting++;
-            } else if (status === 'PAUSED') {
-              agentsPaused++;
-            } else if (status === 'INCALL') {
-              agentsInCalls++;
-            }
-            
-            if (status === 'READY' || status === 'PAUSED') {
-              if (this.users.at(i).get('lead_id') > 0) {
-                agentsInDispo++;
-              }
-            }
-
-            var callerId = this.users.at(i).get('callerid');
-
-            if (callerId) {
-              var call = this.calls.findWhere({ callerid: callerId });
-              
-              if (!call) {
-                agentsInDeadCalls++;
-              }
-            }
-          }
-        }
-        
-        console.log('Agents Logged In: ' + agentsLoggedIn);
-        console.log('Agents Waiting: ' + agentsWaiting);
-        console.log('Agents Paused: ' + agentsPaused);
-        console.log('Agents in Calls: ' + agentsInCalls);
-        console.log('Agents in Dispo: ' + agentsInDispo);
-        console.log('Agents in Dead calls: ' + agentsInDeadCalls);
-
-        
-        //Call Counters
-        var callsRinging = 0;
-        var callsActive = 0;
-        var callsWaiting = 0;
-
-        for (var i=0;i<this.calls.length;i++) {
-          if (inCampaign(this.calls.at(i).get('campaign'))) {
-            callsActive++;
-          
-            var status = this.calls.at(i).get('status');
-            
-            if (status === 'SENT') {
-              callsRinging++;
-            } else if (status === 'XFER') {
-              callsWaiting++;
-            }
-          }
-        }
-        
-        console.log('Calls Active: ' + callsActive);
-        console.log('Calls Ringing: ' + callsRinging);
-        console.log('Calls Waiting: ' + callsWaiting);
-
-
-        function inGroup(group) {
-          //check if the model belongs to the filtered groups
-          if (groups) {
-            if (groups.split(',').indexOf(group) === -1) {
-              return false;
-            } else {
-              return true;
-            }
-          } else {
-            return true;
-          }
-        }
-      
-        function inCampaign(campaign) {
-          //check if model belongs to the filtered campaigns
-          if (campaigns) {
-            if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(campaign) === -1)) {
-              return false;
-            } else {
-              return true;
-            }
-          } else {
-            return true;
-          }
-        }
-      },
-
-			renderStats: function(stats)
-			{
-				for(var key in stats)
-				{
-					var $el = $('[data-stat="' + key + '"]');
-					if($el.length)
-					{
-						$el.text(stats[key]);
-					}
-				}
-
-				if(stats['dropped'] == stats['prev_dropped'])
-				{
-					// $('[data-stat="dropped_running_tally"]').html('<i class="icon-arrow-right text-warning"></i>');
-					$('[data-stat="dropped_running_tally"]').html('');
-					$('[data-stat="dropped_delta"]').html('<span class="text-warning">+- 0</span>');
-					$('[data-stat="dropped_pct"]').parent().removeClass('text-success text-danger').addClass('text-warning');
-				}
-				else if(stats['dropped'] > stats['prev_dropped'])
-				{
-					$('[data-stat="dropped_running_tally"]').html('<i class="icon-arrow-up text-danger"></i>');
-					$('[data-stat="dropped_delta"]').html( '<span class="text-danger">+' + (stats['dropped_pct'] - stats['prev_dropped']) + '</span>' );
-					$('[data-stat="dropped_pct"]').parent().removeClass('text-success text-warning').addClass('text-danger');
-				}
-				else
-				{
-					$('[data-stat="dropped_running_tally"]').html('<i class="icon-arrow-down text-success"></i>');
-					$('[data-stat="dropped_delta"]').html( '<span class="text-success">-' + (stats['prev_dropped'] - stats['dropped_pct']) + '</span>' );
-					$('[data-stat="dropped_pct"]').parent().removeClass('text-warning text-danger').addClass('text-success');
-				}
-			}
-
+		  }
 		});
+
+
 		var App = new AppView;
 
 		$('[title]').tooltip();

@@ -1089,10 +1089,10 @@ th {
 .table thead > tr > td,
 .table tbody > tr > td,
 .table tfoot > tr > td {
-  padding: 8px;
+  padding: 2px;
   line-height: 1.5;
-  vertical-align: top;
   border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
 }
 .table thead > tr > th {
   vertical-align: bottom;
@@ -5860,6 +5860,14 @@ h2 .secondary {
   margin: 10px 0 10px 0;
 }
 
+#resourcesTable .btn {
+  font-size:8px;
+}
+.notifications-key {
+  width:300px;
+  padding:20px;
+}
+
 /* Expanded Display Option */
 .expanded .stat-number {
 	font-size:100px;
@@ -5884,6 +5892,23 @@ h2 .secondary {
   padding: 10px 15px 10px 15px;
 }
 
+.expanded .table thead > tr > th,
+.expanded .table tbody > tr > th,
+.expanded .table tfoot > tr > th,
+.expanded .table thead > tr > td,
+.expanded .table tbody > tr > td,
+.expanded .table tfoot > tr > td {
+  padding: 3px 2px 3px 2px;
+}
+
+.expanded #resourcesTable .btn {
+  font-size:10px;
+}
+.expanded .notifications-key {
+  width:400px;
+  line-height:1.8em;
+}
+
 /* Condensed Display Option */
 .condensed .stat-header {
   font-size: 14px;
@@ -5904,4 +5929,113 @@ h2 .secondary {
 	font-size:40px;
 	line-height:50px;
 	margin-bottom:0px;
+}
+
+.condensed .table thead > tr > th,
+.condensed .table tbody > tr > th,
+.condensed .table tfoot > tr > th,
+.condensed .table thead > tr > td,
+.condensed .table tbody > tr > td,
+.condensed .table tfoot > tr > td {
+  padding: 0 2px 0 2px;
+}
+
+.condensed #resourcesTable .btn {
+  font-size:6px;
+}
+
+.notification-ready {
+  background: #ADD8E6;
+  color:#000000;
+}
+
+.notification-ready a {
+  color:#000000;
+}
+
+.notification-ready-warning {
+  background: #0000FF; 
+  color: #ffffff;
+}
+.notification-ready-warning a {
+  color: #ffffff;
+}
+
+.notification-ready-danger {
+  background: #191970;
+  color: #ffffff;
+}
+
+.notification-ready-danger a {
+  color: #ffffff;
+}
+
+.notification-incall {
+  background: #D8BFD8;
+  color:#000000;
+}
+
+.notification-incall a {
+  color:#000000;
+}
+
+.notification-incall-warning {
+  background: #EE82EE;
+  color:#000000;
+}
+
+.notification-incall-warning a {
+  color:#000000;
+}
+
+.notification-incall-danger {
+  background: #800080;
+  color: #ffffff;
+}
+
+.notification-incall-danger a{
+  color: #ffffff;
+}
+
+.notification-paused {
+  background: #F0E68C;
+  color:#000000;
+}
+
+.notification-paused a {
+  color:#000000;
+}
+
+.notification-paused-warning {
+  background: #FFFF00;
+  color:#000000;
+}
+
+.notification-paused-warning a {
+  color:#000000;
+}
+
+.notification-paused-danger {
+  background: #808000;
+  color: #ffffff;
+}
+
+.notification-paused-danger a{
+  color: #ffffff;
+}
+
+.notification-3way {
+  background: #006600;
+  color: #000000;
+}
+.notification-3way a{
+  color: #000000;
+}
+
+.notification-indeadcall {
+  background: #000000;
+  color: #ffffff;
+}
+.notification-indeadcall a{
+  color: #ffffff;
 }
