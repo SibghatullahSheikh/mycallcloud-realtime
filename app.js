@@ -147,7 +147,7 @@ var permissions = function(req, res, next) {
     query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
         'FROM vicidial_user_groups ' +
         'WHERE user_group = "' + group + '";';
-    
+   
     mysql.query(query, function(err, results) {
       if (err) {
         console.error('MySQL Error: ' + err);
@@ -178,7 +178,7 @@ var permissions = function(req, res, next) {
         req.session.groups = _.without(_.pluck(results, 'user_group'), '---ALL---', 'ADMIN', 'zADMIN');
         checkCampaigns();
       });
-    } else if (req.session.groups == '') {
+    } else if (groups === '' || groups.length === 0) {
       req.session.groups = [group];
       checkCampaigns();
     } else {
@@ -221,7 +221,7 @@ app.get('/', auth, permissions, function(req, res)
 		user: req.session.user,
 		campaigns: req.session.campaigns, 
 		groups: req.session.groups,
-	  customURL: 'http://amazon.com'
+	  customURL: 'http://nativerank.com/account'
   });
 });
 
