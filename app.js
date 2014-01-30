@@ -147,10 +147,16 @@ var permissions = function(req, res, next) {
     query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
         'FROM vicidial_user_groups ' +
         'WHERE user_group = "' + group + '";';
-   
+
     mysql.query(query, function(err, results) {
       if (err) {
         console.error('MySQL Error: ' + err);
+        req.session.campaigns = [];
+        req.session.groups = [];
+        next();
+      } else if (results.length === 0) {
+        //No data returned for this user group
+        console.error('No group permissions found for group: ', group);
         req.session.campaigns = [];
         req.session.groups = [];
         next();
@@ -162,8 +168,8 @@ var permissions = function(req, res, next) {
         campaigns = _.reject(campaigns, function(campaign){ return campaign == '-'; });
        
         //Save the groups
-        groups = results[0].admin_viewable_groups.trim() || [];
-        
+        groups = results[0].admin_viewable_groups.trim().split(' ') || [];
+
         //Check the groups, and then check the campaigns
         checkGroups();
       }
@@ -171,14 +177,14 @@ var permissions = function(req, res, next) {
   }
   
   function checkGroups() {
-    if (groups === '---ALL---') {
+    if (groups[0] === '---ALL---') {
       console.log('Getting unique user_groups');
       var query = 'SELECT DISTINCT user_group FROM vicidial_users;';
       mysql.query(query, function(err, results) {
         req.session.groups = _.without(_.pluck(results, 'user_group'), '---ALL---', 'ADMIN', 'zADMIN');
         checkCampaigns();
       });
-    } else if (groups === '' || groups.length === 0) {
+    } else if (groups[0] === '' || groups.length === 0) {
       req.session.groups = [group];
       checkCampaigns();
     } else {
