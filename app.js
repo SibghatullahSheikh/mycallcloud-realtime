@@ -26,7 +26,7 @@ var app         = express();
 var server      = http.createServer(app);
 var store       = new express.session.MemoryStore();
 var io          = socket.listen(server);
-var SITE_SECRET = 'your secret here';
+var SITE_SECRET = 'saflkj3lkj3dlkj3d9j459612klfjas09djoi3j09jwf';
 
 var mysql  = mysqlServer.createConnection({
   host                 : '66.241.101.90',
@@ -65,7 +65,8 @@ app.configure(function(){
   app.use(express.cookieParser(SITE_SECRET));
   app.use(express.session({
     key: 'express.sid',
-    store: store
+    store: store,
+    cookie: { maxAge:new Date(Date.now() + (1000*60*60*24)) }   //Persist session for one day  
   }));
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
@@ -147,7 +148,7 @@ var permissions = function(req, res, next) {
     query = 'SELECT allowed_campaigns, admin_viewable_groups ' +
         'FROM vicidial_user_groups ' +
         'WHERE user_group = "' + group + '";';
-
+    
     mysql.query(query, function(err, results) {
       if (err) {
         console.error('MySQL Error: ' + err);
@@ -177,7 +178,7 @@ var permissions = function(req, res, next) {
   }
   
   function checkGroups() {
-    if (groups[0] === '---ALL---') {
+    if (groups.indexOf('---ALL---') > -1) {
       console.log('Getting unique user_groups');
       var query = 'SELECT DISTINCT user_group FROM vicidial_users;';
       mysql.query(query, function(err, results) {
@@ -194,7 +195,7 @@ var permissions = function(req, res, next) {
   }
   
   function checkCampaigns() {
-    if (campaigns[0] === '-ALL-CAMPAIGNS-') {
+    if (campaigns.indexOf('-ALL-CAMPAIGNS-') > -1) {
       console.log('Getting distinct campaigns');
       var query = 'SELECT DISTINCT campaign_id ' +
                   'FROM vicidial_campaign_stats ' +
