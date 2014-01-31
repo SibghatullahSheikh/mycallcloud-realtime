@@ -1,74 +1,183 @@
 extends layout
 
 block content
-	.row.text-center
-		.col-lg-2.double-row
-			small Agents Waiting
-			h1(data-stat="agents_waiting")
-		.col-lg-10
-			.row
-				.col-lg-3
-					medium Agents Logged In
-					h1(data-stat="agents_logged_in")
+  .row.full-height
+    //-
+      .col-lg-2#stats
+        aside
+          p.text-muted.text-small Dropped %
+          .row
+            .col-lg-6.text-right
+              .text-large.text-bold
+                span(data-stat="dropped_pct")
+                span %
+            .col-lg-6.text-left
+              span(data-stat="dropped_running_tally")
+              span(data-stat="dropped_delta")
+          p
+            span.text-danger Dropped - 
+              span(data-stat="dropped")
+            br
+            span.text-success Answered - 
+              span(data-stat="answered")
+  
+    .col-lg-12#content
+      .column
+        .portlet#campaign-stats-widget
+          .portlet-header
+            h2 Campaign Statistics
+            button.btn-link.toggle Hide Campaign Stats
+          .portlet-content
+            hr
+            .row(style='text-align:center;')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Dropped %
+                .stat-number#campaign-stats-dropped-percentage
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Today
+                .stat-number#campaign-stats-calls-today
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agent Average Wait
+                .stat-number#campaign-stats-average-wait
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Average Talk Time
+                .stat-number#campaign-stats-average-talk
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Average Wrap
+                .stat-number#campaign-stats-average-wrap
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Average Pause
+                .stat-number#campaign-stats-average-pause
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Dialable Leads
+                .stat-number#campaign-stats-dialable-leads
 
-					hr
+        .portlet#current-status-widget
+          .portlet-header 
+            h2 Current Status
+            button.btn-link.toggle Hide Current Status
+          .portlet-content
+            hr
+            .row(style='text-align:center;')
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents Logged In
+                .stat-number#status-agents-logged-in
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents Waiting
+                .stat-number#status-agents-waiting
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents Paused
+                .stat-number#status-agents-paused
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents In Calls
+                .stat-number#status-agents-in-calls
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents in Dead Calls
+                .stat-number#status-agents-in-dead-calls
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Agents in Dispo
+                .stat-number#status-agents-in-dispo
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Call Active 
+                .stat-number#status-calls-active
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Ringing
+                .stat-number#status-calls-ringing
+              .col-lg-3.col-sm-6.col-xs-12
+                .stat-header Calls Waiting
+                .stat-number#status-calls-waiting
 
-					small Paused Agents
-					h1(data-stat="paused_agents")
-				.col-lg-3
-					medium Agents In Calls
-					h1(data-stat="agents_in_calls")
+        .portlet#calls-waiting-widget
+          .portlet-header 
+            h2 Calls Waiting
+            button.btn-link.toggle Hide Calls Waiting
+          .portlet-content 
+            hr
+            table.table.table-striped#callsTable
+              thead
+                tr
+                  th(class='{sorter: false}', style='cursor:default;') Campaign
+                  th(class='{sorter: false}', style='cursor:default;') Phone
+                  th On Hold Time 
+                  th(class='{sorter: false}', style='cursor:default;') Call Type
+                  th(class='{sorter: false}', style='cursor:default;') Priority
+              tbody
 
-					hr
+        .portlet#active-resources-widget
+          .portlet-header 
+            h2 Active Resources
+            .pull-left
+              button.btn-link.toggle Hide Active Resources
+              | |  
+              a(href='/resources',target='_blank', style='margin-bottom:25px;') Open in new tab
+            .pull-right
+              button.btn-link.notifications Disable Notifications
+              | | 
+              button.dropdown.btn-link
+                a.dropdown-toggle(href='#', data-toggle='dropdown') Key
+                  span.caret
+                .dropdown-menu.pull-right.notifications-key(role='menu')
+                  .pull-left(style='text-align:left;')
+                    .clearfix
+                    
+                    -spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                    span.notification-ready 
+                      != spaces 
+                    |  Agent ready
+                    br
+                    span.notification-ready-warning 
+                      != spaces 
+                    |  Agent ready > 1 minute
+                    br
+                    span.notification-ready-danger 
+                      != spaces 
+                    |  Agent ready > 5 minutes
+                    br
+                    span.notification-paused 
+                      != spaces 
+                    |  Agent paused
+                    br
+                    span.notification-paused-warning 
+                      != spaces 
+                    |  Agent paused > 1 minute
+                    br
+                    span.notification-paused-danger 
+                      != spaces 
+                    |  Agent paused > 5 minutes
+                    br
+                    span.notification-incall 
+                      != spaces 
+                    |  Agent in call
+                    br
+                    span.notification-incall-warning 
+                      != spaces 
+                    |  Agent in call > 1 minute
+                    br
+                    span.notification-incall-danger 
+                      != spaces 
+                    |  Agent in call  > 5 minutes
+                    br
+                    span.notification-3way
+                      != spaces 
+                    |  Agent in 3 way
+                    br
+                    span.notification-indeadcall
+                      != spaces 
+                    |  Agent in dead call
+                    br
 
-					medium Calls Ringing
-					h1(data-stat="calls_ringing")
-				.col-lg-3
-					small Current Active Calls
-					h1(data-stat="current_active_calls")
+          .clearfix
+          
+          .portlet-content
+            hr
+            include _resources-table
+        
+        
+        .portlet#custom-widget
+          .portlet-header 
+            h2 Custom Widget
+            button.btn-link.toggle Hide Custom Widget
+          .portlet-content 
+            hr
+            iframe(src='#{customURL}', height='100%', width='100%')
 
-					hr
-
-					medium Calls Waiting for Agents
-					h1(data-stat="calls_waiting_for_agents")
-				.col-lg-3
-					medium Agents in Dead Calls
-					h1(data-stat="agents_in_dead_calls")
-
-					hr
-
-					medium Agents in Dispo
-					h1(data-stat="agents_in_dispo")
-
-	hr
-
-	h2 Calls Waiting
-
-	table.table.table-striped.table-hover#callsTable
-		thead
-			tr
-				th Campaign
-				th Phone
-				th Time
-				th Call Type
-				th Priority
-		tbody
-
-	hr
-
-	h2 Active Resources
-
-	table.table.table-striped.table-hover#resourcesTable
-		thead
-			tr
-				th User
-				th Status
-				th Time
-				th Campaign
-				th Group
-				th Calls
-				th Contact
-				th Transfer
-				th Success
-				th Actions
-		tbody

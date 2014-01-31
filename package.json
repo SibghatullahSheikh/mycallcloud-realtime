@@ -1,20 +1,26 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "vicidial-realtime",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
-    "start": "node app"
+	"start": "node ./node_modules/supervisor/lib/cli-wrapper.js -w modules,views,app.js -e css,jade,js app.js",
+    "production": "./node_modules/forever/bin/forever start --minUptime 5 --spinSleepTime 5 app.js &",
+    "stop": "./node_modules/forever/bin/forever stop app.js"
   },
   "dependencies": {
-    "express": "3.1.0",
-    "jade": "*",
-    "less-middleware": "*",
-    "mysql": "*",
-    "socket.io": "*",
-    "underscore": "*",
-    "backbone": "*",
-    "request": "*",
-    "cookie": "0.0.5",
-    "cookie-signature": "0.0.1"
+    "jade": "~0.35.0",
+    "less-middleware": "~0.1.14",
+    "mysql": "~2.0.0-rc2",
+    "socket.io": "~0.9.16",
+    "backbone": "~1.1.0",
+    "underscore": "~1.5.2",
+    "request": "~2.30.0",
+    "express": "~3.4.7",
+    "cookie": "~0.1.0",
+    "cookie-signature": "~1.0.1",
+    "forever": "~0.10.11"
+  },
+  "devDependencies": {
+    "supervisor": "~0.5.6"
   }
 }

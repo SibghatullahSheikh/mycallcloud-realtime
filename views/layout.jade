@@ -1,125 +1,133 @@
 doctype 5
 html
-	head
-		title= title
-		link(rel='stylesheet', href='/css/style.css')
-		//if lt IE 9
-			script(src="/js/html5shiv.js")
-			script(src="/js/respond.min.js")
-	body(data-role="main")
-		nav.navbar.navbar-fixed-top
-			.navbar-brand MyCallCloud 
-				i beta
-				//- img(src="/img/logo.png")
-			ul.nav.navbar-nav.pull-right
-				li
-					a(href="#", data-toggle="phone") WebPhone
-						b.caret
-					#webphone
-						object(type="application/x-java-applet", width="300", height="330", hspace="0", vspace="0", align="middle", name="webphone")
-							param(name="code", value="webphone.webphone.class")
-							param(name="archive", value="webphone.jar")
-							param(name="codebase", value="webphone")
-							param(name="hasaudio", value="true")
-							param(name="serveraddress", value=user.external_server_ip)
-							param(name="multilinegui", value="false")
-							param(name="username", value=user.phone_login.replace(/\D/g,''))
-							param(name="password", value=user.conf_secret)
-							param(name="register", value="true")
-							param(name="hasaudio", value="true")
-							param(name="displaysipusername", value="false")
-							param(name="hideusernamepwdinput", value="true")
-							param(name="hasconnect", value="false")
-							param(name="haschat", value="0")
-							param(name="autoaccept", value="true")
-							param(name="use_pcmu", value="3")
-							b Java is currently not installed or not enabled.
+  head
+    title= title
+    link(rel='stylesheet', href='/css/style.css')
+    link(rel='stylesheet', href='/css/theme.bootstrap.css')
+    link(rel='stylesheet', href='/css/jquery-ui-1.10.3.custom.min.css')
+    
+    //if lt IE 9
+      script(src="/js/libs/html5shiv.js")
+      script(src="/js/libs/respond.min.js")
+  body(data-role="main")
+    nav.navbar.navbar-fixed-top
+      .navbar-brand 
+        a(href='/', style='color:#fff') MyCallCloud 
+          i beta
+        //- img(src="/img/logo.png")
+      ul.nav.navbar-nav.pull-right
+        li
+          a(href="#", data-toggle="phone") WebPhone
+            b.caret
+          #webphone
+            object(type="application/x-java-applet", width="300", height="330", hspace="0", vspace="0", align="middle", name="webphone")
+              param(name="code", value="webphone.webphone.class")
+              param(name="archive", value="webphone.jar")
+              param(name="codebase", value="webphone")
+              param(name="hasaudio", value="true")
+              param(name="serveraddress", value=user.external_server_ip)
+              param(name="multilinegui", value="false")
+              param(name="username", value=user.phone_login.replace(/\D/g,''))
+              param(name="password", value=user.conf_secret)
+              param(name="register", value="true")
+              param(name="hasaudio", value="true")
+              param(name="displaysipusername", value="false")
+              param(name="hideusernamepwdinput", value="true")
+              param(name="hasconnect", value="false")
+              param(name="haschat", value="0")
+              param(name="autoaccept", value="true")
+              param(name="use_pcmu", value="3")
+              b Java is currently not installed or not enabled.
 
-				li
-					a(href="#") User Settings
-				li
-					a(href="#") Options
-				li
-					a(href="http://rcs.mycallcloud.com/Reports/tabs.php", target='_blank') Reports
-		.row.full-height
-			.col-lg-2#stats
-				aside
-					p.text-muted.text-small Dropped %
-					.row
-						.col-lg-6.text-right
-							.text-large.text-bold
-								span(data-stat="dropped_pct")
-								span %
-						.col-lg-6.text-left
-							span(data-stat="dropped_running_tally")
-							span(data-stat="dropped_delta")
-					p
-						span.text-danger Dropped - 
-							span(data-stat="dropped")
-						br
-						span.text-success Answered - 
-							span(data-stat="answered")
-				aside
-					p.text-muted.text-small Calls Today
-					span.stat.text-highlight.text-large.text-bold(data-stat="calls_today")
-				aside
-					p.text-muted.text-small Agent Average Wait
-					span.stat.text-highlight.text-large.text-bold(data-stat="agent_avg_wait")
-				aside
-					p.text-muted.text-small Average Talk Time
-					span.stat.text-highlight.text-large.text-bold(data-stat="average_talk_time")
-				aside
-					p.text-muted.text-small Average Wrap
-					span.stat.text-highlight.text-large.text-bold(data-stat="average_wrap")
-				aside
-					p.text-muted.text-small Average Pause
-					span.stat.text-highlight.text-large.text-bold(data-stat="average_pause")
-				//- aside
-				//- 	p.text-muted.text-small Average Agents
-				//- 	span.stat.text-highlight.text-large.text-bold(data-stat="average_agents")
-				aside
-					p.text-muted.text-small Dialable Leads
-					span.stat.text-highlight.text-large.text-bold(data-stat="dialable_leads")
-				//- aside
-				//- 	p.text-muted.text-small Dial Method
-				//- 	span.stat.text-highlight.text-bold.text-capital(data-stat="dial_method")
-			.col-lg-10#content
-				block content
+        li.dropdown
+          a.dropdown-toggle(href="#", data-toggle='dropdown') User Settings
+            span.caret
+          div.dropdown-menu(role='menu', style='width:300px;padding:20px;')
+            form#user-options(role='form')
+              div.form-group
+                label Select Campaigns to Show
+                select.form-control#options-campaigns(multiple)
+                  each campaign in campaigns
+                    option= campaign
+                  
+                  
+              div.checkbox
+                label
+                  input#show-all-campaigns(type='checkbox') 
+                  | Show all campaigns
 
-		script#resource-template(type="text/template")
-			
-			
-			td: a(href!="http://rcs.mycallcloud.com/vicidial/user_stats.php?user=<%= linkid %>", target='_blank') <%= user %>
-			td <%= status %>
-			td <%= time %>
-			td <%= campaign %>
-			td <%= group %>
-			td <%= calls %>
-			td <%= contacts %>
-			td <%= transfers %>
-			td <%= successes %>
-			td
-				.btn-group(data-session-id!="<%= session_id %>", data-server-ip!="<%= server_ip %>", data-extension!="<%= extension %>")
-					a.btn.btn-success(href="#", title="Listen", data-monitor="1")
-						i.icon-headphones
-					a.btn.btn-warning(href="#", title="Coach", data-coach="1")
-						i.icon-microphone
-					a.btn.btn-danger(href="#", title="Barge", data-barge="1")
-						i.icon-bullhorn
+              div(class='form-group')
+                label Select User Groups to Show
+                select.form-control#options-groups(multiple)
+                  each group in groups
+                    option= group
 
-		script#call-template(type="text/template")
-			tr
-				td <%= campaign %>
-				td <%= phone %>
-				td <%= time %>
-				td <%= call_type %>
-				td <%= priority %>
+              div.checkbox
+                label
+                  input#show-all-groups(type='checkbox') 
+                  | Show all user groups
 
-		script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
-		script(src="/js/jquery.metadata.js")
-		script(src="/js/jquery.tablesorter.min.js")
-		script(src="/js/underscore.min.js")
-		script(src="/js/backbone.min.js")
-		script(src="/socket.io/socket.io.js")
-		script(src="/js/bootstrap.min.js")
-		script(src="/js/actions.js")
+              .form-group
+                label Select Display Style
+                select.form-control#options-display
+                  option(value='normal') Normal
+                  option(value='expanded') Expanded
+                  option(value='condensed') Condensed
+
+              a.btn.btn-lg.btn-default.pull-right(href='/') Refresh Display
+
+        li
+          a(href="#") Options
+        
+        li.dropdown
+          a.dropdown-toggle(href='#', data-toggle='dropdown') Reports
+            span.caret
+          ul.dropdown-menu(role='menu')
+            li
+              a(href='http://rcs.mycallcloud.com/Reports/tabs.php', target='blank') Report Tabs
+            li
+              a(href='http://rcs.mycallcloud.com/Reports/agents_stats_v2.php', target='blank') Agent Performance
+            li
+              a(href='http://rcs.mycallcloud.com/Reports/list_performance.php', target='blank') List Performance
+            li
+              a(href='http://rcs.mycallcloud.com/Reports/localize.php', target='blank') Localize
+    
+    block content
+
+    script#resource-template(type="text/template")
+      td: a(href!="http://rcs.mycallcloud.com/vicidial/user_stats.php?user=<%= linkid %>", target='_blank') <%= user %>
+      td <%= status %>
+      td <%= time %>
+      td <%= campaign %>
+      td <%= group %>
+      td <%= calls %>
+      td <%= contacts %>
+      td <%= transfers %>
+      td <%= successes %>
+      td
+        .btn-group.monitor-functions(data-session-id!="<%= session_id %>", data-server-ip!="<%= server_ip %>", data-extension!="<%= extension %>")
+          a.btn.btn-success(href="#", title="Listen", data-monitor="1")
+            i.icon-headphones
+          a.btn.btn-warning(href="#", title="Coach", data-coach="1")
+            i.icon-microphone
+          a.btn.btn-danger(href="#", title="Barge", data-barge="1")
+            i.icon-bullhorn
+
+    script#call-template(type="text/template")
+      td <%= campaign %>
+      td <%= phone %>
+      td <%= on_hold_time %>
+      td <%= call_type %>
+      td <%= priority %>
+
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
+    script(src="/js/libs/jquery.metadata.js")
+    script(src="/js/libs/jquery.tablesorter.min.js")
+    script(src="/js/libs/underscore.min.js")
+    script(src="/js/libs/backbone.min.js")
+    script(src="/js/libs/bootstrap.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(src='/js/libs/jquery-ui-1.10.3.custom.min.js')
+    script(src="/js/app.js")
+
+    block scripts
