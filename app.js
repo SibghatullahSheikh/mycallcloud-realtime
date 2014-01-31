@@ -7,7 +7,7 @@ var
   path         = require('path'),
   Url          = require('url'),
   querystring  = require('querystring'),
-  cookie       = require('express/node_modules/cookie'),
+  cookie       = require('cookie'),
   connectUtils = require('express/node_modules/connect/lib/utils'),
   mysqlServer  = require('mysql'),
   request      = require('request'),
