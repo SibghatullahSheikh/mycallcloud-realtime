@@ -260,6 +260,50 @@
 				}
       }
 		});
+    
+    function Filters() {};
+
+    Filters.getCampaigns = function() {
+      var campaigns = localStorage.getItem('campaigns');
+
+      if (campaigns) {
+        return campaigns.split(',');
+      } else {
+        return [];
+      }
+    };
+
+    Filters.inCampaign = function(campaign) {
+      var campaigns = _.map(Filters.getCampaigns(), function(temp) { return temp.toUpperCase(); });
+
+      if (campaigns.indexOf(campaign.toUpperCase()) > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    Filters.getGroups = function() {
+      var groups = localStorage.getItem('groups');
+
+      if (groups) {
+        return groups.split(',');
+      } else {
+        return [];
+      }
+    };
+
+    Filters.inGroup = function(group) {
+      var groups = _.map(Filters.getGroups(), function(temp) { return temp.toUpperCase(); });
+
+      if (groups.indexOf(group.toUpperCase()) > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+  
+
 
 		var UserOptions = bb.View.extend({
 			
@@ -414,14 +458,11 @@
 					return;
 				}
 				
-				//grab the options	
-				var campaigns = localStorage.getItem('campaigns');
-				
-				if (campaigns) {
-					if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(this.model.get('campaign')) === -1)) {
-						return;
-					}
-				}
+        //Don't render if filtered
+        if (!Filters.inCampaign(this.model.get('campaign'))) {
+          return;
+        }
+        
         this.setElement('<tr>' + this.template(this.model.toJSON()) + '</tr>');
         $('#callsTable').find('tbody').append(this.$el);
 				
@@ -458,9 +499,6 @@
       },
 
       render: function() {
-				//grab the options	
-				var groups = localStorage.getItem('groups');
-				var campaigns = localStorage.getItem('campaigns');
 
         //Agent Counters
         var agentsLoggedIn = 0;
@@ -471,7 +509,7 @@
         var agentsInDeadCalls = 0;
 
         for (var i=0;i<this.agents.length;i++) {
-          if ((inGroup(this.agents.at(i).get('group'))) && (inCampaign(this.agents.at(i).get('campaign')))) {
+          if ((Filters.inGroup(this.agents.at(i).get('group'))) && (Filters.inCampaign(this.agents.at(i).get('campaign')))) {
             agentsLoggedIn++;
           
             var status = this.agents.at(i).get('status');
@@ -508,7 +546,7 @@
         var callsWaiting = 0;
 
         for (var i=0;i<this.calls.length;i++) {
-          if (inCampaign(this.calls.at(i).get('campaign'))) {
+          if (Filters.inCampaign(this.calls.at(i).get('campaign'))) {
             callsActive++;
           
             var status = this.calls.at(i).get('status');
@@ -531,32 +569,6 @@
         this.$el.find('#status-calls-active').text(callsActive);
         this.$el.find('#status-calls-ringing').text(callsRinging);
         this.$el.find('#status-calls-waiting').text(callsWaiting);
-        
-        function inGroup(group) {
-          //check if the model belongs to the filtered groups
-          if (groups) {
-            if (groups.split(',').indexOf(group) === -1) {
-              return false;
-            } else {
-              return true;
-            }
-          } else {
-            return true;
-          }
-        }
-      
-        function inCampaign(campaign) {
-          //check if model belongs to the filtered campaigns
-          if (campaigns) {
-            if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(campaign) === -1)) {
-              return false;
-            } else {
-              return true;
-            }
-          } else {
-            return true;
-          }
-        }
       }
     });
 
@@ -596,7 +608,6 @@
       },
 
       render: function() {
-        var campaigns = localStorage.getItem('campaigns');
         
         //Init Counter Variables
         var callsToday = 0;
@@ -612,7 +623,7 @@
         //Loop through the collection and count the fields of the filtered campaigns
         for(var i=0;i<this.collection.length;i++) {
           //check if this collections campaign is selected by the filter
-          if (inCampaign(this.collection.at(i).get('id'))) {
+          if (Filters.inCampaign(this.collection.at(i).get('id'))) {
             //Increment Counters
             callsToday += this.collection.at(i).get('calls_today'); 
             dropsToday += this.collection.at(i).get('drops_today');
@@ -641,20 +652,6 @@
         this.$el.find('#campaign-stats-average-talk').text(averageTalk);
         this.$el.find('#campaign-stats-average-wrap').text(averageWrap);
         this.$el.find('#campaign-stats-dropped-percentage').text(droppedPercentage);
-
-
-        function inCampaign(campaign) {
-          //check if model belongs to the filtered campaigns
-          if (campaigns) {
-            if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(campaign) === -1)) {
-              return false;
-            } else {
-              return true;
-            }
-          } else {
-            return true;
-          }
-        }
       },
     });
    
@@ -700,24 +697,14 @@
       },
 
 			render: function()
-			{	
-				//grab the options	
-				var groups = localStorage.getItem('groups');
-				var campaigns = localStorage.getItem('campaigns');
+			{
+        if (!Filters.inCampaign(this.model.get('campaign'))) {
+          return;
+        }
 
-				//check if user belongs to the filtered campaigns
-				if (campaigns) {
-					if ((campaigns != '-ALL-CAMPAIGNS-') && (campaigns.split(',').indexOf(this.model.get('campaign')) === -1)) {
-						return;
-					}
-				} 
-
-				//check if the user belongs to the filtered groups
-				if (groups) {
-					if (groups.split(',').indexOf(this.model.get('group')) === -1) {
-					return;
-					}
-				} 
+        if (!Filters.inGroup(this.model.get('group'))) {
+          return; 
+        }
 
 				var attrs = this.model.toJSON();
 				attrs.time = this.formatTime(attrs.time);
