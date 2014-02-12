@@ -111,60 +111,61 @@ block content
               | |  
               a(href='/resources',target='_blank', style='margin-bottom:25px;') Open in new tab
             .pull-right
-              button.btn-link.notifications Disable Notifications
-              | | 
-              button.dropdown.btn-link
-                a.dropdown-toggle(href='#', data-toggle='dropdown') Key
-                  span.caret
-                .dropdown-menu.pull-right.notifications-key(role='menu')
-                  .pull-left(style='text-align:left;')
-                    .clearfix
-                    
-                    -spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-                    span.notification-ready 
-                      != spaces 
-                    |  Agent ready
-                    br
-                    span.notification-ready-warning 
-                      != spaces 
-                    |  Agent ready > 1 minute
-                    br
-                    span.notification-ready-danger 
-                      != spaces 
-                    |  Agent ready > 5 minutes
-                    br
-                    span.notification-paused 
-                      != spaces 
-                    |  Agent paused
-                    br
-                    span.notification-paused-warning 
-                      != spaces 
-                    |  Agent paused > 1 minute
-                    br
-                    span.notification-paused-danger 
-                      != spaces 
-                    |  Agent paused > 5 minutes
-                    br
-                    span.notification-incall 
-                      != spaces 
-                    |  Agent in call
-                    br
-                    span.notification-incall-warning 
-                      != spaces 
-                    |  Agent in call > 1 minute
-                    br
-                    span.notification-incall-danger 
-                      != spaces 
-                    |  Agent in call  > 5 minutes
-                    br
-                    span.notification-3way
-                      != spaces 
-                    |  Agent in 3 way
-                    br
-                    span.notification-indeadcall
-                      != spaces 
-                    |  Agent in dead call
-                    br
+              ul.nav
+                li.btn-lin(style='float:left;display:inline;list-style-type:none;') 
+                  a.btn-link.notifications Disable Notifications
+                li.dropdown.btn-link(style='float:left;display:inline;list-style-type:none;')
+                  a.dropdown-toggle(href='#', data-toggle='dropdown') Key
+                    span.caret
+                  .dropdown-menu.pull-right.notifications-key(role='menu')
+                    .pull-left(style='text-align:left;')
+                      .clearfix
+                      
+                      -spaces = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+                      span.notification-ready 
+                        != spaces 
+                      |  Agent ready
+                      br
+                      span.notification-ready-warning 
+                        != spaces 
+                      |  Agent ready > 1 minute
+                      br
+                      span.notification-ready-danger 
+                        != spaces 
+                      |  Agent ready > 5 minutes
+                      br
+                      span.notification-paused 
+                        != spaces 
+                      |  Agent paused
+                      br
+                      span.notification-paused-warning 
+                        != spaces 
+                      |  Agent paused > 1 minute
+                      br
+                      span.notification-paused-danger 
+                        != spaces 
+                      |  Agent paused > 5 minutes
+                      br
+                      span.notification-incall 
+                        != spaces 
+                      |  Agent in call
+                      br
+                      span.notification-incall-warning 
+                        != spaces 
+                      |  Agent in call > 1 minute
+                      br
+                      span.notification-incall-danger 
+                        != spaces 
+                      |  Agent in call  > 5 minutes
+                      br
+                      span.notification-3way
+                        != spaces 
+                      |  Agent in 3 way
+                      br
+                      span.notification-indeadcall
+                        != spaces 
+                      |  Agent in dead call
+                      br
 
           .clearfix
           
