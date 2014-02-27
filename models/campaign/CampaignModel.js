@@ -15,7 +15,7 @@ function CampaignModel (mysql) {
                 'agent_pause_today, ' +
                 'dialable_leads ' +
                 'FROM vicidial_campaign_stats ' +
-                'WHERE calls_today > 10';
+                'WHERE dialable_leads > 10';
 
     self.mysql.query(query, function(err, results) {
       if (err) callback(err);

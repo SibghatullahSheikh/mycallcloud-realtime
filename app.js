@@ -29,7 +29,7 @@ var io          = socket.listen(server);
 var SITE_SECRET = 'saflkj3lkj3dlkj3d9j459612klfjas09djoi3j09jwf';
 
 var mysql  = mysqlServer.createConnection({
-  host                 : '66.241.101.90',
+  host                 : '192.168.100.59',
   user                 : 'cron',
   password             : '1234',
   database             : 'asteriskrcs',
@@ -37,7 +37,7 @@ var mysql  = mysqlServer.createConnection({
   timezone			   : 'EST'
 });
 var agi = new Agi({
-  host      : '10.0.20.199',
+  host      : '192.168.100.51',
   port      : 5038,
   encoding  : 'ascii',
   username  : 'cron',
@@ -55,7 +55,7 @@ var agentsController = new AgentsController(mysql);
  * All Environment Settings
  */
 app.configure(function(){
-  app.set('port', process.env.PORT || 3002);
+  app.set('port', process.env.PORT || 3001);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -164,6 +164,7 @@ var permissions = function(req, res, next) {
       } else {
         //Save the campaigns
         campaigns = results[0].allowed_campaigns.trim().split(' ') || [];
+		console.log('shad :' + campaigns);
         
         //Remove the erroneous '-' campaign value
         campaigns = _.reject(campaigns, function(campaign){ return campaign == '-'; });
@@ -199,7 +200,7 @@ var permissions = function(req, res, next) {
       console.log('Getting distinct campaigns');
       var query = 'SELECT DISTINCT campaign_id ' +
                   'FROM vicidial_campaign_stats ' +
-                  'WHERE calls_today > 10';
+		  'WHERE dialable_leads > 0 union SELECT DISTINCT group_id from vicidial_inbound_groups';
       
       mysql.query(query, function(err, results) {
         if (err) {
@@ -228,7 +229,7 @@ app.get('/', auth, permissions, function(req, res)
 		user: req.session.user,
 		campaigns: req.session.campaigns, 
 		groups: req.session.groups,
-	  customURL: 'http://nativerank.com/account'
+	  customURL: 'http://rcs.mycallcloud.com/Reports/tabs.php'
   });
 });
 
@@ -308,7 +309,7 @@ io.sockets.on('connection', function (socket)
   socket.on('monitor', function(data, cb)
   {
     var
-      url  = 'http://10.0.20.199/vicidial/non_agent_api.php',
+      url  = 'http://192.168.100.51/vicidial/non_agent_api.php',
       data = {
         'function'    : 'blind_monitor',
         'stage'       : 'MONITOR',
@@ -337,7 +338,7 @@ io.sockets.on('connection', function (socket)
   socket.on('barge', function(data, cb)
   {
     var
-      url  = 'http://10.0.20.199/vicidial/non_agent_api.php',
+      url  = 'http://192.168.100.51/vicidial/non_agent_api.php',
       data = {
         'function'    : 'blind_monitor',
         'stage'       : 'BARGE',

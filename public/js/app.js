@@ -454,7 +454,7 @@
       },
 
 			render: function() {
-				if(this.model.get('status') !== 'XFER') {
+				if(this.model.get('status') !== 'LIVE') {
 					return;
 				}
 				
@@ -553,7 +553,7 @@
             
             if (status === 'SENT') {
               callsRinging++;
-            } else if (status === 'XFER') {
+            } else if (status === 'LIVE') {
               callsWaiting++;
             }
           }

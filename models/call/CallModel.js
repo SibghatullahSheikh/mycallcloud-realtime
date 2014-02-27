@@ -15,7 +15,7 @@ function CallModel (mysql) {
                 'queue_priority AS priority, ' +
                 'agent_only, ' +
                 'callerid ' + 
-                'FROM vicidial_auto_calls';
+                'FROM vicidial_auto_calls where status IN ("LIVE", "CLOSER")';
     
     self.mysql.query(query, function(err, results) {
       if (err) callback(err);
